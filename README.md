@@ -10,7 +10,7 @@ Adam Bequali
 Adam Bekkali  
 Maïlys Poulain  
 
-|  Compétitions           | Épreuves                                       | Couples  |
+|  🏇Compétitions           | Épreuves                                       | Couples  |
 |-------------------------|------------------------------------------------|------------|
 | Numéro de la compétition| Numéro d'ordre (Ordre des épreuves)            | Cavalier (Nom, Prénom, Numéro de licence) |
 | Intitulé                | Intitulé                                       | cheval (Nom, numéro de sire)|
@@ -22,9 +22,7 @@ Maïlys Poulain
 | Nom du coach    |                                                  | Entrée de piste        |
 | Nom de l'écurie |                                                  | Lecteur                |
 
-| Colonne 1  | Colonne 2  | Colonne 3  |
-|:-----------|:----------:|-----------:|
-| Ligne 1, C1 |  | Ligne 1, C3 |
-| Ligne 2, C1 | Ligne 2, C2 | Ligne 2, C3 |
-| Ligne 3, C1 | Ligne 3, C2 | Ligne 3, C3 |
-²
+| Statuts des Épreuves                             | Statuts des Couples -----------------------------------------------------| Accessibilité par Rôle |
+|:-------------------------------------------------|:------------------------------------------------------------------------:|-----------:|
+| Status (A venir, En cours, Terminée, Clôturée)   | Status (Partant, En piste, En bord de piste, Non partant, Fini, Éliminé) | Rôles (Jury, Entrée de piste, Lecteur) |
+
