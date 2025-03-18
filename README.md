@@ -6,23 +6,36 @@ Diego Montorier
 Matheus Kops Guedes  
 Abdelali Imzilen  
 Adam Bequali  
-=======
-Adam Bekkali  
 Maïlys Poulain  
 
-|  🏇Compétitions           | Épreuves                                       | Couples  |
-|-------------------------|------------------------------------------------|------------|
-| Numéro de la compétition| Numéro d'ordre (Ordre des épreuves)            | Cavalier (Nom, Prénom, Numéro de licence) |
-| Intitulé                | Intitulé                                       | cheval (Nom, numéro de sire)|
-| Type (CSO ou Equifun)   | Statut (A venir, En cours, Terminée, Cloturée) | Statut du couple dans l'épreuve (Partant, En piste, En bord de piste, Non Partant, Fini, Eliminer )|
+### 🏆 Tableau 1 : Compétitions, Épreuves et Couples
 
-| Événements      | Résultats                                        | Rôles des utilisateurs |
-|:----------------|-------------------------------------------------:|-----------------------:|
-|Numéro de passage| Status (Temps, Pénalité, Temps total, Classement) | Jury                   |
-| Nom du coach    |                                                  | Entrée de piste        |
-| Nom de l'écurie |                                                  | Lecteur                |
+| 🏅 **Compétitions** | 📋 **Épreuves** | 🐴👤 **Couples (Cavalier & Cheval)** |
+|--------------------|---------------|--------------------------------|
+| 🔢 **Numéro** | 🔢 **Numéro d'ordre** | 👤 **Cavalier** : Nom, Prénom, Licence |
+| 🏆 **Intitulé** | 🏁 **Intitulé** | 🐴 **Cheval** : Nom, Numéro de sire |
+| 🎭 **Type** (CSO/Equifun) | 📌 **Statut** : A venir, En cours, Terminée, Clôturée | 🚦 **Statut du couple** : Partant, En piste, En bord de piste, Non Partant, Fini, Éliminé |
 
-| Statuts des Épreuves                             | Statuts des Couples -----------------------------------------------------| Accessibilité par Rôle |
-|:-------------------------------------------------|:------------------------------------------------------------------------:|-----------:|
-| Status (A venir, En cours, Terminée, Clôturée)   | Status (Partant, En piste, En bord de piste, Non partant, Fini, Éliminé) | Rôles (Jury, Entrée de piste, Lecteur) |
+---
 
+### 📊 Tableau 2 : Événements, Résultats et Rôles des Utilisateurs  
+
+| 🎟️ **Événements** | 🏁 **Résultats** | 🎭 **Rôles des Utilisateurs** |
+|-----------------|------------|---------------------|
+| 🔢 **Numéro de passage** | ⏱️ **Temps** | 👨‍⚖️ **Jury** : Accès complet |
+| 🏋️‍♂️ **Coach** | ❌ **Pénalité** | 🚪 **Entrée de Piste** : Accès aux couples entrants |
+| 🏡 **Écurie** | ⏳ **Temps total** | 📖 **Lecteur** : Accès limité |
+| | 🏆 **Classement** | |
+
+---
+
+### 🏅 Tableau 3 : Statuts des Épreuves, Statuts des Couples et Accessibilité  
+
+| 📌 **Statuts des Épreuves** | 🚦 **Statuts des Couples** | 🔑 **Accessibilité par Rôle** |
+|------------------|----------------------|-------------------|
+| ⏳ **A venir** | 🟢 **Partant** : Inscrit, pas encore passé | 👨‍⚖️ **Jury** : Accès total |
+| 🎯 **En cours** | 🟡 **En piste** : Concourt actuellement | 🚪 **Entrée de Piste** : Suivi des entrées |
+| ✅ **Terminée** | 🟠 **En bord de piste** : Attend son tour | 📖 **Lecteur** : Visualisation restreinte |
+| 🔒 **Clôturée** | ❌ **Non Partant** : Ne participera pas | |
+| | 🏁 **Fini** : A terminé l’épreuve | |
+| | 🚫 **Éliminé** : Disqualifié | |
