@@ -1,4 +1,98 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:postgres@localhost:5432/app_db?schema=public"
+  url      = env("DATABASE_URL") // Charge l'URL depuis .env
+}
+
+// 📌 Définition des ENUMs (types personnalisés)
+enum TypeCompetition {
+  CSO
+  Equifun
+}
+
+enum StatutEpreuve {
+  A_venir
+  En_cours
+  Terminee
+  Cloturee
+}
+
+enum StatutParticipation {
+  Partant
+  En_piste
+  En_bord_de_piste
+  Non_Partant
+  Fini
+  Elimine
+}
+
+enum TypeUtilisateur {
+  jury
+  entree_de_piste
+  lecteur
+  administrateur
+}
+
+// 📌 Modèle Competition
+model Competition {
+  id        Int             @id @default(autoincrement())
+  numero    String          @unique
+  intitule  String
+  type      TypeCompetition
+  epreuves  Epreuve[]
+}
+
+// 📌 Modèle Epreuve
+model Epreuve {
+  id             Int             @id @default(autoincrement())
+  competition    Competition     @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  competitionId  Int
+  intitule       String
+  numero_ordre   Int
+  statut         StatutEpreuve   @default(A_venir)
+  participations Participer[]
+}
+
+// 📌 Modèle Couple
+model Couple {
+  id              Int                   @id @default(autoincrement())
+  numero_licence  String                @unique
+  nom_cavalier    String
+  prenom_cavalier String
+  coach           String
+  ecurie          String
+  numero_sire     String                @unique
+  nom_cheval      String
+  numero_passage  String
+  statut          StatutParticipation    @default(Partant)
+  participations  Participer[]
+}
+
+// 📌 Modèle Utilisateur
+model Utilisateur {
+  id           Int            @id @default(autoincrement())
+  nom          String
+  prenom       String
+  email        String         @unique
+  mot_de_passe String
+  type         TypeUtilisateur
+}
+
+// 📌 Modèle Participer (relation entre Epreuve et Couple)
+model Participer {
+  id             Int      @id @default(autoincrement())
+  epreuve        Epreuve  @relation(fields: [epreuveId], references: [id], onDelete: Cascade)
+  epreuveId      Int
+  couple         Couple   @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  coupleId       Int
+  numero_passage Int
+  temps          Decimal? @db.Decimal(5, 2)
+  penalite       Int?
+  temps_total    Decimal? @db.Decimal(5, 2)
+  classement     Int?
 }
