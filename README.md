@@ -6,6 +6,8 @@ Diego Montorier
 Matheus Kops Guedes  
 Abdelali Imzilen  
 Adam Bequali  
+=======
+Adam Bekkali  
 Maïlys Poulain  
 
 |  Compétitions           | Épreuves                                       | Couples  |
@@ -25,3 +27,4 @@ Maïlys Poulain
 | Ligne 1, C1 |  | Ligne 1, C3 |
 | Ligne 2, C1 | Ligne 2, C2 | Ligne 2, C3 |
 | Ligne 3, C1 | Ligne 3, C2 | Ligne 3, C3 |
+²
