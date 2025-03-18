@@ -5,7 +5,7 @@
 Diego Montorier  
 Matheus Kops Guedes  
 Abdelali Imzilen  
-Adam Bekali  
+Adam Bekkali  
 Maïlys Poulain  
 
 |  Compétitions           | Épreuves                                       | Couples  |
