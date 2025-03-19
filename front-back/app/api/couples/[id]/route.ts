@@ -3,23 +3,36 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// GET - Récupérer un couple par ID
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+// GET - Récupérer tous les couples
+export async function GET(request: NextRequest) {
   try {
-    const id = parseInt(params.id);
+    const { searchParams } = new URL(request.url);
     
-    if (isNaN(id)) {
-      return NextResponse.json(
-        { error: "ID invalide" },
-        { status: 400 }
-      );
-    }
+    // Paramètres optionnels de filtrage et pagination
+    const search = searchParams.get('search') || '';
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '20');
+    const skip = (page - 1) * limit;
     
-    const couple = await prisma.couple.findUnique({
-      where: { id },
+    // Construction de la requête de filtrage
+    const where = search 
+      ? {
+          OR: [
+            { numero_licence: { contains: search, mode: 'insensitive' } },
+            { nom_cavalier: { contains: search, mode: 'insensitive' } },
+            { prenom_cavalier: { contains: search, mode: 'insensitive' } },
+            { nom_cheval: { contains: search, mode: 'insensitive' } },
+            { ecurie: { contains: search, mode: 'insensitive' } },
+          ],
+        } 
+      : {};
+    
+    // Récupérer les couples avec pagination
+    const couples = await prisma.couple.findMany({
+      where:{},
+      skip,
+      take: limit,
+      orderBy: { nom_cavalier: 'asc' },
       include: {
         participations: {
           include: {
@@ -33,83 +46,55 @@ export async function GET(
       }
     });
     
-    if (!couple) {
-      return NextResponse.json(
-        { error: "Couple non trouvé" },
-        { status: 404 }
-      );
-    }
+    // Compter le nombre total pour la pagination
+    const total = await prisma.couple.count({ where:{} });
     
-    return NextResponse.json(couple);
+    return NextResponse.json({
+      couples,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
-    console.error("Erreur lors de la récupération du couple:", error);
+    console.error("Erreur lors de la récupération des couples:", error);
     return NextResponse.json(
-      { error: "Une erreur est survenue lors de la récupération du couple" },
+      { error: "Une erreur est survenue lors de la récupération des couples" },
       { status: 500 }
     );
   }
 }
 
-// PUT - Mettre à jour un couple
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+// POST - Créer un nouveau couple
+export async function POST(request: NextRequest) {
   try {
-    const id = parseInt(params.id);
+    const body = await request.json();
     
-    if (isNaN(id)) {
+    // Validation des données
+    if (!body.numero_licence || !body.nom_cavalier || !body.prenom_cavalier || 
+        !body.coach || !body.ecurie || !body.numero_sire || !body.nom_cheval || !body.numero_passage) {
       return NextResponse.json(
-        { error: "ID invalide" },
+        { error: "Tous les champs sont obligatoires" },
         { status: 400 }
       );
     }
     
-    const body = await request.json();
-    
-    // Vérifier si le couple existe
+    // Vérification de l'unicité du numéro de licence
     const existingCouple = await prisma.couple.findUnique({
-      where: { id }
+      where: { numero_licence: body.numero_licence }
     });
     
-    if (!existingCouple) {
+    if (existingCouple) {
       return NextResponse.json(
-        { error: "Couple non trouvé" },
-        { status: 404 }
+        { error: "Un couple avec ce numéro de licence existe déjà" },
+        { status: 409 }
       );
     }
     
-    // Vérifier si le nouveau numéro de licence est déjà utilisé par un autre couple
-    if (body.numero_licence && body.numero_licence !== existingCouple.numero_licence) {
-      const licenceExists = await prisma.couple.findUnique({
-        where: { numero_licence: body.numero_licence }
-      });
-      
-      if (licenceExists) {
-        return NextResponse.json(
-          { error: "Ce numéro de licence est déjà utilisé" },
-          { status: 409 }
-        );
-      }
-    }
-    
-    // Vérifier si le nouveau numéro SIRE est déjà utilisé par un autre couple
-    if (body.numero_sire && body.numero_sire !== existingCouple.numero_sire) {
-      const sireExists = await prisma.couple.findUnique({
-        where: { numero_sire: body.numero_sire }
-      });
-      
-      if (sireExists) {
-        return NextResponse.json(
-          { error: "Ce numéro SIRE est déjà utilisé" },
-          { status: 409 }
-        );
-      }
-    }
-    
-    // Mettre à jour le couple
-    const updatedCouple = await prisma.couple.update({
-      where: { id },
+    // Création du couple
+    const newCouple = await prisma.couple.create({
       data: {
         numero_licence: body.numero_licence,
         nom_cavalier: body.nom_cavalier,
@@ -119,15 +104,16 @@ export async function PUT(
         numero_sire: body.numero_sire,
         nom_cheval: body.nom_cheval,
         numero_passage: body.numero_passage,
-        statut: body.statut
+        statut: body.statut || 'Partant'
       }
     });
     
-    return NextResponse.json(updatedCouple);
+    return NextResponse.json(newCouple, { status: 201 });
   } catch (error) {
-    console.error("Erreur lors de la mise à jour du couple:", error);
+    console.error("Erreur lors de la création du couple:", error);
     
-    if (error.code === 'P2002') {
+    // Gestion des erreurs spécifiques
+    if (error === 'P2002') {
       return NextResponse.json(
         { error: "Contrainte d'unicité violée. Vérifiez le numéro de licence ou le numéro SIRE." },
         { status: 409 }
@@ -135,52 +121,7 @@ export async function PUT(
     }
     
     return NextResponse.json(
-      { error: "Une erreur est survenue lors de la mise à jour du couple" },
-      { status: 500 }
-    );
-  }
-}
-
-// DELETE - Supprimer un couple
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const id = parseInt(params.id);
-    
-    if (isNaN(id)) {
-      return NextResponse.json(
-        { error: "ID invalide" },
-        { status: 400 }
-      );
-    }
-    
-    // Vérifier si le couple existe
-    const existingCouple = await prisma.couple.findUnique({
-      where: { id }
-    });
-    
-    if (!existingCouple) {
-      return NextResponse.json(
-        { error: "Couple non trouvé" },
-        { status: 404 }
-      );
-    }
-    
-    // Supprimer le couple (et ses participations grâce à la cascade)
-    await prisma.couple.delete({
-      where: { id }
-    });
-    
-    return NextResponse.json(
-      { message: "Couple supprimé avec succès" },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Erreur lors de la suppression du couple:", error);
-    return NextResponse.json(
-      { error: "Une erreur est survenue lors de la suppression du couple" },
+      { error: "Une erreur est survenue lors de la création du couple" },
       { status: 500 }
     );
   }

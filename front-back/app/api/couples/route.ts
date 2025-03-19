@@ -1,7 +1,5 @@
-// app/api/couples/routes.ts
-
-import { NextResponse } from 'next/server';
-
+// app/api/couples/route.ts
+import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -11,108 +9,52 @@ export async function GET() {
   try {
     const couples = await prisma.couple.findMany({
       include: {
-        cheval: true,
-        cavalier: true
+        participations: {
+          include: {
+            epreuve: true
+          }
+        }
       }
     });
 
     return NextResponse.json(couples, { status: 200 });
   } catch (error) {
+    console.error("Erreur lors de la récupération des couples:", error);
     return NextResponse.json({ error: 'Erreur lors de la récupération des couples.' }, { status: 500 });
   }
 }
 
 // Route POST pour créer un nouveau couple
-export async function POST(req: Request) {
-  const { cheval_id, cavalier_id, coach_nom, ecurie } = await req.json();
-
+export async function POST(req: NextRequest) {
   try {
+    const body = await req.json();
+    
+    // Validation des données requises
+    if (!body.numero_licence || !body.nom_cavalier || !body.prenom_cavalier || 
+        !body.coach || !body.ecurie || !body.numero_sire || !body.nom_cheval || !body.numero_passage) {
+      return NextResponse.json(
+        { error: "Tous les champs sont obligatoires" },
+        { status: 400 }
+      );
+    }
+    
     const couple = await prisma.couple.create({
       data: {
-        cheval_id,
-        cavalier_id,
-        coach_nom,
-        ecurie
+        numero_licence: body.numero_licence,
+        nom_cavalier: body.nom_cavalier,
+        prenom_cavalier: body.prenom_cavalier,
+        coach: body.coach,
+        ecurie: body.ecurie,
+        numero_sire: body.numero_sire,
+        nom_cheval: body.nom_cheval,
+        numero_passage: body.numero_passage,
+        statut: body.statut || 'Partant'
       }
     });
 
     return NextResponse.json(couple, { status: 201 });
   } catch (error) {
+    console.error("Erreur lors de la création du couple:", error);
     return NextResponse.json({ error: 'Erreur lors de la création du couple.' }, { status: 500 });
-  }
-}
-
-// Route GET pour obtenir un couple par son ID
-export async function GET_BY_ID(req: Request) {
-  const url = new URL(req.url);
-  const id = url.pathname.split('/').pop();
-
-  if (!id) {
-    return NextResponse.json({ error: 'ID manquant.' }, { status: 400 });
-  }
-
-  try {
-    const couple = await prisma.couple.findUnique({
-      where: { id: parseInt(id) },
-      include: {
-        cheval: true,
-        cavalier: true
-      }
-    });
-
-    if (!couple) {
-      return NextResponse.json({ error: 'Couple non trouvé.' }, { status: 404 });
-    }
-
-    return NextResponse.json(couple, { status: 200 });
-  } catch (error) {
-    return NextResponse.json({ error: 'Erreur lors de la récupération du couple.' }, { status: 500 });
-  }
-}
-
-// Route PUT pour mettre à jour un couple
-export async function PUT(req: Request) {
-  const url = new URL(req.url);
-  const id = url.pathname.split('/').pop();
-  const { cheval_id, cavalier_id, coach_nom, ecurie } = await req.json();
-
-  if (!id) {
-    return NextResponse.json({ error: 'ID manquant.' }, { status: 400 });
-  }
-
-  try {
-    const couple = await prisma.couple.update({
-      where: { id: parseInt(id) },
-      data: {
-        cheval_id,
-        cavalier_id,
-        coach_nom,
-        ecurie
-      }
-    });
-
-    return NextResponse.json(couple, { status: 200 });
-  } catch (error) {
-    return NextResponse.json({ error: 'Erreur lors de la mise à jour du couple.' }, { status: 500 });
-  }
-}
-
-// Route DELETE pour supprimer un couple
-export async function DELETE(req: Request) {
-  const url = new URL(req.url);
-  const id = url.pathname.split('/').pop();
-
-  if (!id) {
-    return NextResponse.json({ error: 'ID manquant.' }, { status: 400 });
-  }
-
-  try {
-    await prisma.couple.delete({
-      where: { id: parseInt(id) }
-    });
-
-    return NextResponse.json({ message: 'Couple supprimé avec succès.' }, { status: 200 });
-  } catch (error) {
-    return NextResponse.json({ error: 'Erreur lors de la suppression du couple.' }, { status: 500 });
   }
 }
