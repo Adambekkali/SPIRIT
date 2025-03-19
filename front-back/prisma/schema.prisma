@@ -1,4 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:postgres@localhost:5432/app_db?schema=public"
+  url      = env("DATABASE_URL")
+}
+
+// Définition des enums
+enum TypeCompetition {
+  CSO
+  Equifun
+}
+
+enum StatutEpreuve {
+  A_venir    @map("A venir")
+  En_cours   @map("En cours")
+  Terminee   @map("Terminée")
+  Cloturee   @map("Cloturée")
+}
+
+enum StatutParticipation {
+  Partant
+  En_piste           @map("En piste")
+  En_bord_de_piste   @map("En bord de piste")
+  Non_Partant        @map("Non Partant")
+  Fini
+  Elimine            @map("Eliminé")
+}
+
+enum TypeUtilisateur {
+  jury
+  entree_de_piste    @map("entree de piste")
+  lecteur
+  administrateur
+}
+
+// Modèles
+model Competition {
+  id          Int             @id @default(autoincrement())
+  numero      String          @unique @db.VarChar(20)
+  intitule    String          @db.VarChar(255)
+  type        TypeCompetition
+  epreuves    Epreuve[]
+
+  @@map("Competition")
+}
+
+model Epreuve {
+  id              Int             @id @default(autoincrement())
+  competition     Competition     @relation(fields: [competition_id], references: [id], onDelete: Cascade)
+  competition_id  Int
+  intitule        String          @db.VarChar(255)
+  numero_ordre    Int
+  statut          StatutEpreuve   @default(A_venir)
+  participations  Participer[]
+
+  @@map("Epreuve")
+}
+
+model Couple {
+  id                Int                  @id @default(autoincrement())
+  numero_licence    String               @unique @db.VarChar(50)
+  nom_cavalier      String               @db.VarChar(255)
+  prenom_cavalier   String               @db.VarChar(255)
+  coach             String               @db.VarChar(255)
+  ecurie            String               @db.VarChar(255)
+  numero_sire       String               @unique @db.VarChar(50)
+  nom_cheval        String               @db.VarChar(255)
+  numero_passage    String               @db.VarChar(255)
+  statut            StatutParticipation  @default(Partant)
+  participations    Participer[]
+
+  @@map("Couple")
+}
+
+model Utilisateur {
+  id            Int              @id @default(autoincrement())
+  nom           String           @db.VarChar(255)
+  prenom        String           @db.VarChar(255)
+  email         String           @unique @db.VarChar(255)
+  mot_de_passe  String
+  type          TypeUtilisateur
+
+  @@map("Utilisateur")
+}
+
+model Participer {
+  id              Int       @id @default(autoincrement())
+  epreuve         Epreuve   @relation(fields: [epreuve_id], references: [id], onDelete: Cascade)
+  epreuve_id      Int
+  couple          Couple    @relation(fields: [couple_id], references: [id], onDelete: Cascade)
+  couple_id       Int
+  numero_passage  Int
+  temps           Decimal?  @db.Decimal(5, 2)
+  penalite        Int?
+  temps_total     Decimal?  @db.Decimal(5, 2)
+  classement      Int?
+
+  @@map("Participer")
 }

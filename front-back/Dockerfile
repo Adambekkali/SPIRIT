@@ -2,17 +2,19 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copie des fichiers de configuration
+# Installation des dépendances pendant la construction
 COPY package.json package-lock.json* ./
-
-# Installation des dépendances
 RUN npm ci
 
-# Copie du code source
+# Copie du reste des fichiers
 COPY . .
 
-# Exposition du port
-EXPOSE 3000
+# Génération du client Prisma pendant la construction
+# (cette partie ne dépend pas de la base de données)
+RUN npx prisma generate
 
-# Commande de démarrage en développement
-CMD ["npm", "run", "dev"]
+# Exposition des ports
+EXPOSE 3000 5555
+
+# La commande de démarrage qui attend PostgreSQL et initialise la base de données
+CMD sh -c "echo 'Attente de PostgreSQL...' && sleep 5 && npx prisma db push && npx prisma db seed && npm run dev"
