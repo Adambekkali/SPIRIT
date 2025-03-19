@@ -3,6 +3,14 @@ import bcrypt from 'bcryptjs'
 const prisma = new PrismaClient()
 
 async function main() {
+  // Effacer les données existantes pour éviter les duplications
+  await prisma.participer.deleteMany({});
+  await prisma.epreuve.deleteMany({});
+  await prisma.couple.deleteMany({});
+  await prisma.competition.deleteMany({});
+  await prisma.utilisateur.deleteMany({});
+
+
   // Insertion des compétitions
   const competition1 = await prisma.competition.upsert({
     where: { numero: 'COMP2025-001' },
@@ -260,7 +268,6 @@ async function main() {
   })
 
   // Insertion des utilisateurs
-
   const defaultHashedPassword = await bcrypt.hash('motdepasse', 10);
 
   await prisma.utilisateur.upsert({
@@ -270,7 +277,7 @@ async function main() {
       nom: 'Admin',
       prenom: 'System',
       email: 'admin@competition.fr',
-      mot_de_passe: defaultHashedPassword, // À remplacer par un hash réel en production
+      mot_de_passe: defaultHashedPassword,
       type: 'administrateur',
     },
   })

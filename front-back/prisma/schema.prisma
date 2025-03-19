@@ -56,6 +56,7 @@ model Epreuve {
   statut          StatutEpreuve   @default(A_venir)
   participations  Participer[]
 
+  @@unique([competition_id, numero_ordre])
   @@map("Epreuve")
 }
 
@@ -98,5 +99,6 @@ model Participer {
   temps_total     Decimal?  @db.Decimal(5, 2)
   classement      Int?
 
+  @@unique([epreuve_id, couple_id])
   @@map("Participer")
 }
