@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
 const prisma = new PrismaClient()
 
 async function main() {
@@ -259,6 +260,9 @@ async function main() {
   })
 
   // Insertion des utilisateurs
+
+  const defaultHashedPassword = await bcrypt.hash('motdepasse', 10);
+
   await prisma.utilisateur.upsert({
     where: { email: 'admin@competition.fr' },
     update: {},
@@ -266,7 +270,7 @@ async function main() {
       nom: 'Admin',
       prenom: 'System',
       email: 'admin@competition.fr',
-      mot_de_passe: 'motdepassehashé', // À remplacer par un hash réel en production
+      mot_de_passe: defaultHashedPassword, // À remplacer par un hash réel en production
       type: 'administrateur',
     },
   })
@@ -278,7 +282,7 @@ async function main() {
       nom: 'Jury',
       prenom: 'Principal',
       email: 'jury@competition.fr',
-      mot_de_passe: 'motdepassehashé',
+      mot_de_passe: defaultHashedPassword,
       type: 'jury',
     },
   })
@@ -290,7 +294,7 @@ async function main() {
       nom: 'Piste',
       prenom: 'Entrée',
       email: 'entree@competition.fr',
-      mot_de_passe: 'motdepassehashé',
+      mot_de_passe: defaultHashedPassword,
       type: "entree_de_piste"
     },
   })
@@ -302,7 +306,7 @@ async function main() {
       nom: 'Lecteur',
       prenom: 'Public',
       email: 'lecteur@competition.fr',
-      mot_de_passe: 'motdepassehashé',
+      mot_de_passe: defaultHashedPassword,
       type: 'lecteur',
     },
   })
