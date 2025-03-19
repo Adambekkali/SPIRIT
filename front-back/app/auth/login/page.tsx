@@ -15,28 +15,45 @@ export default function Login() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
-        const response = await fetch("/api/auth/login", {
-            method: "POST",
-            body: JSON.stringify({ email, mot_de_passe: password }),
-        })
-
-        if (response.ok) {
-            // Extraire les données JSON de la réponse
-            const data = await response.json();
-            
-            // Le token est dans data.token
-            const token = data.token;
-            console.log("token: ", token);
-            
-            // Stocker le token dans localStorage ou cookies
-            localStorage.setItem("token_spirit", token);
-            
-            setIsLoggedIn(true);
-            router.push("/couples?isLoggedIn=true");
-
-            // router.push("/couples?isLoggedIn=true");
-        } else {
-            setError("Email ou mot de passe incorrect");
+        
+        try {
+            // 1. Authentification
+            const loginResponse = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email, mot_de_passe: password }),
+            });
+    
+            if (loginResponse.ok) {
+                const data = await loginResponse.json();
+                const token = data.token;
+                
+                // 2. Création de session sécurisée
+                const sessionResponse = await fetch("/api/auth/session", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ token }),
+                });
+                
+                if (sessionResponse.ok) {
+                    setIsLoggedIn(true);
+                    router.push("/?hasLoggedIn=true");
+                } else {
+                    setError("Erreur lors de la création de la session");
+                }
+            } else {
+                const errorData = await loginResponse.json();
+                setError(errorData.error || "Email ou mot de passe incorrect");
+            }
+        } catch (err) {
+            console.error("Erreur:", err);
+            setError("Une erreur s'est produite");
+        } finally {
+            setIsLoading(false);
         }
     }
 
