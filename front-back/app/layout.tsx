@@ -27,10 +27,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header>
-          header
-        </header>
-        {children}
+        <div className="flex flex-col min-h-screen">
+          <header className="p-4">
+            <h1 className="text-4xl font-bold text-center py-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg rounded-md t">
+              SPIRIT
+            </h1>
+          </header>
+          <main className="flex flex-col flex-1">
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   );
