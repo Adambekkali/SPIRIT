@@ -15,7 +15,7 @@ back-end: Next
 Front-end: Next.js  
 
 
-### Users stories:
+## Users stories:
 1. Authentification et Accès
 2. Sélection du Concours
 3. Gestion des Épreuves
@@ -24,7 +24,7 @@ Front-end: Next.js
 6. Gestion des Statuts des Épreuves
 
 
-### 🏆 Tableau 1 : Compétitions, Épreuves et Couples
+## 🏆 Tableau 1 : Compétitions, Épreuves et Couples
 
 | 🏅 **Compétitions** | 📋 **Épreuves** | 🐴👤 **Couples (Cavalier & Cheval)** |
 |--------------------|---------------|--------------------------------|
@@ -34,7 +34,7 @@ Front-end: Next.js
 
 ---
 
-### 📊 Tableau 2 : Événements, Résultats et Rôles des Utilisateurs  
+## 📊 Tableau 2 : Événements, Résultats et Rôles des Utilisateurs  
 
 | 🎟️ **Événements** | 🏁 **Résultats** | 🎭 **Rôles des Utilisateurs** |
 |-----------------|------------|---------------------|
@@ -45,7 +45,7 @@ Front-end: Next.js
 
 ---
 
-### 🏅 Tableau 3 : Statuts des Épreuves, Statuts des Couples et Accessibilité  
+## 🏅 Tableau 3 : Statuts des Épreuves, Statuts des Couples et Accessibilité  
 
 | 📌 **Statuts des Épreuves** | 🚦 **Statuts des Couples** | 🔑 **Accessibilité par Rôle** |
 |------------------|----------------------|-------------------|
