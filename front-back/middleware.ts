@@ -36,7 +36,7 @@ export async function middleware(request: NextRequest) {
           headers: requestHeaders,
         },
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erreur JWT:", error);
       return NextResponse.json(
         { error: "Session invalide ou expirée", details: error.message },
