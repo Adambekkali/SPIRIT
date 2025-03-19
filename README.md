@@ -8,6 +8,22 @@ Abdelali Imzilen
 Adam Bequali  
 Maïlys Poulain  
 
+
+## Technologies:
+bd: postgresql  
+back-end: Next  
+Front-end: Next.js  
+
+
+### Users stories:
+1. Authentification et Accès
+2. Sélection du Concours
+3. Gestion des Épreuves
+4. Gestion des Couples dans une Épreuve
+5. Suivi des Résultats
+6. Gestion des Statuts des Épreuves
+
+
 ### 🏆 Tableau 1 : Compétitions, Épreuves et Couples
 
 | 🏅 **Compétitions** | 📋 **Épreuves** | 🐴👤 **Couples (Cavalier & Cheval)** |
