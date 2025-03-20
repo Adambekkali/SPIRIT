@@ -4,11 +4,25 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 
 const EvaluationPage: React.FC = () => {
+
   const searchParams = useSearchParams();
-  const id = searchParams.get("id") || undefined;
-  const idEpreuve = searchParams.get("epreuveId") || undefined;
-  const [couple, setCouple] = useState<any>(null);
-  const [epreuve, setEpreuve] = useState<any>(null);
+  const participation_id = searchParams.get("participation_id") || undefined;
+  const [participation, setParticipation] = useState<any>(null);
+  const getParticipation = async () => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/participations/${participation_id}`);
+      if (!res.ok) {
+        throw new Error("Erreur lors de la récupération des données.");
+      }
+      const data = await res.json();
+      setParticipation(data);
+    }
+    catch (err) {
+      setError("Impossible de charger les données de la participation.");
+      console.error(err);
+    }
+  }
+
   const [isJudging, setIsJudging] = useState(false);
   const [penalite, SetPenalite] = useState(0);
   const [temps, setTime] = useState(0);
@@ -16,43 +30,11 @@ const EvaluationPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const getCouple = async () => {
-    try {
-      const res = await fetch(`http://localhost:3000/api/couples/${id}`);
-      if (!res.ok) {
-        throw new Error("Erreur lors de la récupération des données.");
-      }
-      const data = await res.json();
-      setCouple(data);
-    } catch (err) {
-      setError("Impossible de charger les données du couple.");
-      console.error(err);
-    }
-  };
-
-  const getEpreuve = async () => {
-    try {
-      const res = await fetch(`http://localhost:3000/api/epreuves/${idEpreuve}`);
-      if (!res.ok) {
-        throw new Error("Erreur lors de la récupération des données.");
-      }
-      const data = await res.json();
-      console.log("Epreuve recup " + data);
-      setEpreuve(data);
-    } catch (err) {
-      setError("Impossible de charger les données du couple.");
-      console.error(err);
-    }
-  };
-
   useEffect(() => {
-    if (id) {
-      getCouple();
+    if (participation_id) {
+      getParticipation();
     }
-    if (idEpreuve) {
-      getEpreuve();
-    }
-  }, [id, idEpreuve]);
+  }, [participation_id]);
 
   const startTimer = () => {
     if (!timerRunning) {
@@ -94,17 +76,26 @@ const EvaluationPage: React.FC = () => {
   };
 
   const handleSaveResults = async () => {
+    
     const results = {
       temps,
       penalite,
-      couple_id: couple?.id || "echec recup id couple",
-      type_compete : epreuve?.competition?.type || "echec recup type competition",
+      couple_id: participation?.couple?.id || "echec recup id couple",
+      type_compete : participation.epreuve?.competition?.type || "echec recup type competition",
+      temps_total : temps,
+      
     };
+
+    if (participation.epreuve?.competition?.type === "CSO") {
+      results.temps_total += penalite;
+    }
+
+
     console.log("Résultats:", results);
     resetTimer();
     setIsJudging(false);
     try {
-      const response = await fetch(`http://localhost:3000/api/participations/${id}`, {
+      const response = await fetch(`http://localhost:3000/api/participations/${participation?.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -162,7 +153,7 @@ const EvaluationPage: React.FC = () => {
                 Nom cavalier
               </td>
               <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-                {couple?.nom_cavalier || "Chargement..."}
+                {participation?.couple?.nom_cavalier || "Chargement..."}
               </td>
             </tr>
             <tr>
@@ -170,7 +161,7 @@ const EvaluationPage: React.FC = () => {
                 Nom cheval
               </td>
               <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-                {couple?.nom_cheval || "Chargement..."}
+                {participation?.couple?.nom_cheval || "Chargement..."}
               </td>
             </tr>
             <tr>
@@ -178,7 +169,7 @@ const EvaluationPage: React.FC = () => {
                 Coach
               </td>
               <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-                {couple?.coach || "Chargement..."}
+                {participation?.couple?.coach || "Chargement..."}
               </td>
             </tr>
             <tr>
@@ -186,7 +177,7 @@ const EvaluationPage: React.FC = () => {
                 Ecurie
               </td>
               <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-                {couple?.ecurie || "Chargement..."}
+                {participation?.couple?.ecurie || "Chargement..."}
               </td>
             </tr>
             <tr>
@@ -194,19 +185,19 @@ const EvaluationPage: React.FC = () => {
                 Numéro de licence
               </td>
               <td style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-                {couple?.numero_licence || "Chargement..."}
+                {participation?.couple?.numero_licence || "Chargement..."}
               </td>
             </tr>
             <tr>
               <td style={{ fontWeight: "bold", padding: "10px" }}>Numéro de passage</td>
               <td style={{ padding: "10px" }}>
-                {couple?.numero_passage || "Chargement..."}
+                {participation?.couple?.numero_passage || "Chargement..."}
               </td>
             </tr>
             <tr>
               <td style={{ fontWeight: "bold", padding: "10px" }}>Type Compétition</td>
               <td style={{ padding: "10px" }}>
-                {epreuve?.competition?.type || "Chargement..."}
+                {participation?.epreuve?.competition?.type || "Chargement..."}
               </td>
             </tr>
           </tbody>
@@ -263,7 +254,7 @@ const EvaluationPage: React.FC = () => {
               marginBottom: "20px",
             }}
           >
-            {epreuve?.competition?.type === "CSO" ? (
+            {participation?.epreuve?.competition?.type === "CSO" ? (
               <div>
                 <button
                   onClick={handleAddPenalty}

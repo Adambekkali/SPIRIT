@@ -104,9 +104,7 @@ const Epreuves = () => {
                                             className="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 cursor-pointer"
                                             onClick={() => {
                                                 const queryParams = new URLSearchParams({
-                                                    id: part.couple.id,
-                                                    epreuveId: selectedEpreuve.id,
-                                                    competitionId: selectedEpreuve.competition?.id,
+                                                    participation_id: part.id,
                                                 }).toString();
                                                 window.location.href = `SR/evaluation?${queryParams}`;
                                             }}
