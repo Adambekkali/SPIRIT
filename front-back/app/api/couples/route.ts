@@ -28,33 +28,58 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    
-    // Validation des données requises
-    if (!body.numero_licence || !body.nom_cavalier || !body.prenom_cavalier || 
-        !body.coach || !body.ecurie || !body.numero_sire || !body.nom_cheval || !body.numero_passage) {
+
+    // Validate required fields
+    const requiredFields = [
+      "numero_licence",
+      "nom_cavalier",
+      "prenom_cavalier",
+      "nom_cheval",
+      "coach",
+      "ecurie",
+      "statut",
+    ];
+    for (const field of requiredFields) {
+      if (!body[field]) {
+        return NextResponse.json(
+          { error: `Le champ ${field} est obligatoire.` },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Check if the license number is unique
+    const existingCouple = await prisma.couple.findUnique({
+      where: { numero_licence: body.numero_licence },
+    });
+    if (existingCouple) {
       return NextResponse.json(
-        { error: "Tous les champs sont obligatoires" },
-        { status: 400 }
+        { error: "Un couple avec ce numéro de licence existe déjà." },
+        { status: 409 }
       );
     }
-    
+
+    // Create the couple
     const couple = await prisma.couple.create({
       data: {
         numero_licence: body.numero_licence,
         nom_cavalier: body.nom_cavalier,
         prenom_cavalier: body.prenom_cavalier,
+        nom_cheval: body.nom_cheval,
         coach: body.coach,
         ecurie: body.ecurie,
-        numero_sire: body.numero_sire,
-        nom_cheval: body.nom_cheval,
-        numero_passage: body.numero_passage,
-        statut: body.statut || 'Partant'
-      }
+        statut: body.statut,
+        numero_sire: body.numero_sire || null, // Optional field
+        numero_passage: body.numero_passage || null, // Optional field
+      },
     });
 
     return NextResponse.json(couple, { status: 201 });
   } catch (error) {
     console.error("Erreur lors de la création du couple:", error);
-    return NextResponse.json({ error: 'Erreur lors de la création du couple.' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Une erreur interne est survenue lors de la création du couple." },
+      { status: 500 }
+    );
   }
 }
