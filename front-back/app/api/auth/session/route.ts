@@ -4,6 +4,18 @@ import * as jose from 'jose';
 const JWT_SECRET = process.env.JWT_SECRET || 'votre_secret_jwt_pour_developpement';
 const secret = new TextEncoder().encode(JWT_SECRET);
 
+// récupérer le token de l'utilisateur
+export async function GET(request: NextRequest) {
+  const { cookies } = request;
+  const token = cookies.get('token_spirit')?.value;
+
+  if (!token) {
+    return NextResponse.json({ error: 'No token provided' }, { status: 401 });
+  }
+  return NextResponse.json({ isConnected: true }, { status: 200 });
+}
+
+// vérifier si le token est valide
 export async function POST(request: NextRequest) {
   try {
     const { token } = await request.json();
