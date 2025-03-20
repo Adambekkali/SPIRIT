@@ -18,11 +18,16 @@ const PUBLIC_PATHS = [
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
+  console.log("Requête interceptée :", request.nextUrl.pathname);
+  console.log("Méthode :", request.method);
+  console.log("Token dans les cookies :", request.cookies.get('token_spirit'));
+
+
   // Vérifier si le chemin est public
-  const isPublicPath = PUBLIC_PATHS.some(publicPath => 
+  const isPublicPath = PUBLIC_PATHS.some(publicPath =>
     path.startsWith(publicPath)
   );
-  
+
   // Autoriser l'accès aux chemins publics
   if (isPublicPath || path === '/') {
     return NextResponse.next();
