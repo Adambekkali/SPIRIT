@@ -16,11 +16,11 @@ const Couples = async () => {
             <table>
                 <thead>
                     <tr>
-                        <th>Numéro de licence</th>
-                        <th>Nom du cavalier</th>
-                        <th>Prénom du cavalier</th>
-                        <th>Coach</th>
-                        <th>Ecurie</th>
+                        <Th>Numéro de licence</Th>
+                        <Th>Nom du cavalier</Th>
+                        <Th>Prénom du cavalier</Th>
+                        <Th>Coach</Th>
+                        <Th>Ecurie</Th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,3 +44,11 @@ const Couples = async () => {
 }
 
 export default Couples;
+
+const Th = ({ children }: { children: React.ReactNode }) => {
+    return (
+        <th className="border-2 border-gray-300 rounded-md p-2">
+            {children}
+        </th>
+    )
+}

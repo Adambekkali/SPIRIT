@@ -1,7 +1,9 @@
-// prisma.ts
+import { PrismaClient } from '@prisma/client'
 
-import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient()
 
-const prisma = new PrismaClient(); // Créer l'instance du client Prisma
+const globalForPrisma = global as unknown as { prisma: typeof prisma }
 
-export default prisma; // Exporter l'instance pour l'utiliser ailleurs
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+
+export default prisma
