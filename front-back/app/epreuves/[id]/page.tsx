@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
 import React, { Usable, useEffect, useState } from "react";
+import { fetchWithErrorHandling } from "@/utils/utils";
+import { useRouter } from "next/navigation";
 
 // Types pour renforcer la sécurité du typage
 interface Couple {
@@ -34,26 +36,11 @@ interface Epreuve {
   participations: Participation[];
 }
 
-// Fonction pour récupérer les données de façon plus robuste
-async function fetchWithErrorHandling(url: string) {
-  try {
-    const res = await fetch(url);
-    
-    if (!res.ok) {
-      throw new Error(`Erreur HTTP: ${res.status}`);
-    }
-    
-    return await res.json();
-  } catch (error) {
-    console.error(`Erreur de récupération depuis ${url}:`, error);
-    throw error;
-  }
-}
-
-const Epreuves = ({ params }: { params: Usable<{ id: string; }> }) => {
+const Epreuves = ({ params }: { params: Usable<{ id: string }> }) => {
   const [epreuve, setEpreuve] = useState<Epreuve | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
   
   const { id } = React.use(params);
 
@@ -73,15 +60,28 @@ const Epreuves = ({ params }: { params: Usable<{ id: string; }> }) => {
     fetchData();
   }, [id]);
 
+  const handleRetour = () => {
+    // Revenir à la page des épreuves avec l'ID de la compétition
+    if (epreuve && epreuve.competition) {
+      router.push(`/epreuves?competitionId=${epreuve.competition.id}`);
+    } else {
+      // Fallback si pas de compétition trouvée
+      router.push('/epreuves');
+    }
+  };
+
   if (loading) return <p className="text-center text-gray-500">Chargement des données...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
   if (!epreuve) return <p className="text-center text-amber-500">Aucune épreuve trouvée</p>;
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-        <Link href={`/epreuves`} className="mb-4 inline-block bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700 hover:cursor-pointer">
-            Voir toutes les épreuves
-        </Link>
+        <button 
+          onClick={handleRetour} 
+          className="mb-4 inline-block bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-700 hover:cursor-pointer"
+        >
+            Retour aux épreuves
+        </button>
         <h1 className="text-2xl font-bold text-center mb-6">Détails de l'épreuve</h1>
 
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
