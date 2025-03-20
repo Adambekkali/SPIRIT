@@ -28,6 +28,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // GET sur les api
+  if (request.method === 'GET' && path.startsWith('/api/')) {
+    return NextResponse.next();
+  }
+
   // Récupérer le token depuis le cookie
   const cookieToken = request.cookies.get('token_spirit')?.value;
 
