@@ -102,8 +102,17 @@ const EvaluationPage: React.FC = () => {
         },
         body: JSON.stringify(results),
       });
+      const classage = await fetch(`http://localhost:3000/api/epreuves/${participation?.epreuve_id}/classement`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
       if (!response.ok) {
         throw new Error("Erreur lors de l'enregistrement des résultats.");
+      }
+      if (!classage.ok) {
+        throw new Error("Erreur lors du classement.");
       }
       console.log("Résultats enregistrés avec succès.");
     } catch (error) {
