@@ -9,10 +9,20 @@ export async function GET(request: NextRequest) {
   const { cookies } = request;
   const token = cookies.get('token_spirit')?.value;
 
+  // vérifier si le token est valide
   if (!token) {
     return NextResponse.json({ error: 'No token provided' }, { status: 401 });
   }
-  return NextResponse.json({ isConnected: true }, { status: 200 });
+  // vérifier si le token est valide
+  try {
+    await jose.jwtVerify(token, secret);
+
+    // Si le token est valide, récupérer les données de l'utilisateur
+    const decoded = await jose.decodeJwt(token);
+    return NextResponse.json(decoded, { status: 200 });
+  } catch (error) {
+    return NextResponse.json({ error: 'Token invalide' }, { status: 401 });
+  }
 }
 
 // vérifier si le token est valide

@@ -80,6 +80,7 @@ const Epreuves = () => {
                                 <Th>Classement</Th>
                                 <Th>Statut</Th>
                                 <Th>Juger</Th>
+                                <Th>Modifier</Th>
                             </tr>
                         </thead>
                         <tbody>
@@ -111,6 +112,19 @@ const Epreuves = () => {
                                             }}
                                         >
                                             Juger
+                                        </button>
+                                    </Td>
+                                    <Td>
+                                        <button
+                                            className="bg-yellow-500 text-white px-4 py-1 rounded-md hover:bg-yellow-600 cursor-pointer"
+                                            onClick={() => {
+                                                const queryParams = new URLSearchParams({
+                                                    id: part.couple.id,
+                                                }).toString();
+                                                window.location.href = `SR/modifier?${queryParams}`;
+                                            }}
+                                        >
+                                            Modifier
                                         </button>
                                     </Td>
                                 </tr>
