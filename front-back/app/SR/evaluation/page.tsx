@@ -8,8 +8,8 @@ const EvaluationPage: React.FC = () => {
   const id = searchParams.get("id") || undefined;
   const [couple, setCouple] = useState<any>(null);
   const [isJudging, setIsJudging] = useState(false);
-  const [penalties, setPenalties] = useState(0);
-  const [time, setTime] = useState(0);
+  const [penalite, SetPenalite] = useState(0);
+  const [temps, setTime] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null); // Utiliser useRef pour stocker le timer
@@ -59,7 +59,7 @@ const EvaluationPage: React.FC = () => {
       timerRef.current = null;
     }
     setTime(0);
-    setPenalties(0);
+    SetPenalite(0);
     setTimerRunning(false);
   };
 
@@ -73,17 +73,33 @@ const EvaluationPage: React.FC = () => {
   }, []);
 
   const handleAddPenalty = () => {
-    setPenalties((prevPenalties) => prevPenalties + 1);
+    SetPenalite((prevPenalties) => prevPenalties + 1);
   };
 
-  const handleSaveResults = () => {
+  const handleSaveResults = async () => {
     const results = {
-      time,
-      penalties,
+      temps,
+      penalite,
+      couple_id: couple?.id || "echec recup id couple",
     };
-    console.log("Results saved:", results);
+    console.log("Résultats:", results);
     resetTimer();
     setIsJudging(false);
+    try {
+      const response = await fetch(`http://localhost:3000/api/participations/${id}`, {
+        method: "PUT", // Utiliser la méthode PUT pour mettre à jour les résultats
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(results),
+      });
+      if (!response.ok) {
+        throw new Error("Erreur lors de l'enregistrement des résultats.");
+      }
+      console.log("Résultats enregistrés avec succès.");
+    } catch (error) {
+      console.error("Erreur:", error);
+    }
   };
 
   if (error) {
@@ -194,7 +210,7 @@ const EvaluationPage: React.FC = () => {
         </button>
       ) : (
         <div style={{ textAlign: "center" }}>
-          <h1 style={{ fontSize: "48px", margin: "20px 0" }}>Chrono: {time}s</h1>
+          <h1 style={{ fontSize: "48px", margin: "20px 0" }}>Chrono: {temps}s</h1>
           <button
             onClick={timerRunning ? stopTimer : startTimer}
             style={{
@@ -244,7 +260,7 @@ const EvaluationPage: React.FC = () => {
               +
             </button>
             <button
-              onClick={() => setPenalties((prev) => Math.max(prev - 1, 0))}
+              onClick={() => SetPenalite((prev) => Math.max(prev - 1, 0))}
               style={{
                 padding: "10px",
                 fontSize: "24px",
@@ -271,7 +287,7 @@ const EvaluationPage: React.FC = () => {
               marginBottom: "20px",
             }}
           >
-            Pénalités: {penalties}
+            Pénalités: {penalite}
           </p>
           <button
             onClick={handleSaveResults}
