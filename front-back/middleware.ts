@@ -4,93 +4,91 @@ import * as jose from 'jose';
 const JWT_SECRET = process.env.JWT_SECRET || 'votre_secret_jwt_pour_developpement';
 const secret = new TextEncoder().encode(JWT_SECRET);
 
-// Liste des chemins publics qui ne nécessitent pas d'authentification
-const PUBLIC_PATHS = [
-  '/auth/login',
-  '/api/auth/login',
-  '/api/auth/session',
-  '/_next',
-  '/favicon.ico',
-  '/images',
-  '/styles'
+// Routes publiques
+const PRIVATE_PATHS = [
+    "/profil",
+    "/admin",
+    "/couples",
+];
+
+// Routes accessibles en lecture seule sans authentification
+const PUBLIC_READ_PATHS = [
+    '/api/competitions',
+    '/api/epreuves',
+    '/api/couples',
 ];
 
 export async function middleware(request: NextRequest) {
-  const path = request.nextUrl.pathname;
-
-  console.log("Requête interceptée :", request.nextUrl.pathname);
-  console.log("Méthode :", request.method);
-  console.log("Token dans les cookies :", request.cookies.get('token_spirit'));
-
-
-  // Vérifier si le chemin est public
-  const isPublicPath = PUBLIC_PATHS.some(publicPath =>
-    path.startsWith(publicPath)
-  );
-
-  // Autoriser l'accès aux chemins publics
-  if (isPublicPath || path === '/') {
-    return NextResponse.next();
-  }
-
-  // GET sur les api
-  if (request.method === 'GET' && path.startsWith('/api/')) {
-    return NextResponse.next();
-  }
-
-  // Récupérer le token depuis le cookie
-  const cookieToken = request.cookies.get('token_spirit')?.value;
-
-  // Si le token de connexion n'est pas présent, renvoyer vers la page de login
-  if (!cookieToken) {
-    console.log("Aucun token dans les cookies, redirection vers login");
-    return NextResponse.redirect(new URL('/auth/login', request.url));
-  }
-
-  try {
-    // Vérifier et décoder le token avec jose
-    const { payload } = await jose.jwtVerify(cookieToken, secret);
+    const path = request.nextUrl.pathname;
     
-    // Ajouter les informations de l'utilisateur aux headers pour les API
-    if (path.startsWith('/api/')) {
-      const requestHeaders = new Headers(request.headers);
-      requestHeaders.set('x-user-id', payload.userId?.toString() || "");
-      requestHeaders.set('x-user-role', payload.type?.toString() || "");
-      
-      // Continuer avec la requête modifiée
-      return NextResponse.next({
-        request: {
-          headers: requestHeaders,
-        },
-      });
+    // Vérifier si le chemin est public
+    const isPublicPath = !PRIVATE_PATHS.some(publicPath => 
+        path.startsWith(publicPath)
+    );
+    
+    // Autoriser l'accès aux chemins publics
+    if (isPublicPath || path === '/') {
+        return NextResponse.next();
     }
     
-    // Si ce n'est pas une API, simplement autoriser l'accès
-    return NextResponse.next();
-  } catch (error: any) {
-    console.error("Token invalide ou expiré:", error);
+    // Autoriser les requêtes GET pour les chemins en lecture seule publics
+    const isPublicReadPath = PUBLIC_READ_PATHS.some(publicPath => 
+        path.startsWith(publicPath)
+    );
     
-    // Pour les API, renvoyer une erreur JSON
-    if (path.startsWith('/api/')) {
-      return NextResponse.json(
-        { error: "Session invalide ou expirée", details: error.message },
-        { status: 401 }
-      );
+    if (isPublicReadPath && request.method === 'GET') {
+        return NextResponse.next();
     }
     
-    // Pour les pages, rediriger vers login
-    console.log("Token invalide, redirection vers login");
-    // Supprimer le cookie invalide
-    const response = NextResponse.redirect(new URL('/auth/login', request.url));
-    response.cookies.delete('token_spirit');
-    return response;
-  }
+    // Récupérer le token depuis le cookie
+    const token = request.cookies.get('token_spirit')?.value;
+    
+    if (!token) {
+        // API => erreur 401, Pages => redirection login
+        if (path.startsWith('/api/')) {
+            return NextResponse.json(
+                { error: "Authentification requise" },
+                { status: 401 }
+            );
+        } else {
+            return NextResponse.redirect(new URL('/auth/login', request.url));
+        }
+    }
+    
+    try {
+        // Vérifier le token
+        const { payload } = await jose.jwtVerify(token, secret);
+        
+        // Ajouter les infos utilisateur aux en-têtes pour les API
+        if (path.startsWith('/api/')) {
+            const requestHeaders = new Headers(request.headers);
+            requestHeaders.set('x-user-id', String(payload.userId));
+            requestHeaders.set('x-user-role', String(payload.type));
+            
+            return NextResponse.next({
+                request: {
+                    headers: requestHeaders,
+                },
+            });
+        }
+        
+        // Pour les pages, simplement autoriser l'accès
+        return NextResponse.next();
+    } catch (error) {
+        console.error("Erreur JWT:", error);
+        
+        // Token invalide => supprimer le cookie
+        const response = path.startsWith('/api/')
+            ? NextResponse.json({ error: "Session invalide ou expirée" }, { status: 401 })
+            : NextResponse.redirect(new URL('/auth/login', request.url));
+            
+        response.cookies.delete('token_spirit');
+        return response;
+    }
 }
 
-// Configurer les chemins sur lesquels le middleware s'applique
 export const config = {
-  matcher: [
-    // Appliquer à tous les chemins sauf les fichiers statiques
-    '/((?!_next/static|_next/image).*)'
-  ],
+    matcher: [
+        '/((?!_next/static|_next/image).*)'
+    ],
 };
