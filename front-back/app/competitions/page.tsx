@@ -53,7 +53,7 @@ export default function SelectCompetition() {
   const selectedComp = competitions.find(comp => comp.id === selectedCompetition);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", backgroundColor: "#f3f4f6", padding: "16px" }}>
+    <div className="flex flex-col items-center justify-center flex-1 p-4">
       <div style={{ width: "100%", maxWidth: "400px", padding: "16px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", backgroundColor: "white", borderRadius: "8px" }}>
         <h2 style={{ fontSize: "20px", fontWeight: "bold", marginBottom: "16px" }}>Sélectionnez un concours</h2>
         <select onChange={handleSelectCompetition} style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}>
