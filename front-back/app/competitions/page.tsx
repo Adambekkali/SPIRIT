@@ -53,10 +53,10 @@ export default function SelectCompetition() {
   const selectedComp = competitions.find(comp => comp.id === selectedCompetition);
 
   return (
-    <div className="flex flex-col items-center justify-center flex-1 p-4">
-      <div style={{ width: "100%", maxWidth: "400px", padding: "16px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", backgroundColor: "white", borderRadius: "8px" }}>
-        <h2 style={{ fontSize: "20px", fontWeight: "bold", marginBottom: "16px" }}>Sélectionnez un concours</h2>
-        <select onChange={handleSelectCompetition} style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}>
+    <div className="flex flex-col flex-1 items-center justify-center p-4">
+      <div className="w-full max-w-md p-4 shadow-lg bg-white rounded-lg">
+        <h2 className="text-xl font-bold mb-4">Sélectionnez un concours</h2>
+        <select onChange={handleSelectCompetition} className="w-full p-2 border border-gray-300 rounded-md">
           <option value="">Choisissez un concours</option>
           {competitions.map((comp) => (
             <option key={comp.id} value={comp.id}>
@@ -65,19 +65,19 @@ export default function SelectCompetition() {
           ))}
         </select>
         {selectedComp && (
-          <div style={{ marginTop: "16px", padding: "8px", backgroundColor: "#dbeafe", borderRadius: "4px", color: "#1e40af" }}>
-            <p><strong>{selectedComp.name}</strong></p>
+          <div className="mt-4 p-3 bg-blue-100 rounded-md text-blue-900">
+            <p className="font-bold">{selectedComp.name}</p>
             <p>Numéro: {selectedComp.numero}</p>
             <p>Type: {selectedComp.type}</p>
-            <h3 style={{ marginTop: "12px" }}>Épreuves :</h3>
-            <ul>
+            <h3 className="mt-3 font-semibold">Épreuves :</h3>
+            <ul className="list-disc list-inside">
               {selectedComp.epreuves.map(ep => (
                 <li key={ep.id}>{ep.intitule} (Ordre: {ep.numero_ordre})</li>
               ))}
             </ul>
           </div>
         )}
-        <button style={{ marginTop: "16px", width: "100%", padding: "10px", backgroundColor: "#3b82f6", color: "white", borderRadius: "4px", border: "none", cursor: "pointer" }} disabled={!selectedCompetition}>
+        <button className="mt-4 w-full p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition" disabled={!selectedCompetition}>
           Accéder aux épreuves
         </button>
       </div>
