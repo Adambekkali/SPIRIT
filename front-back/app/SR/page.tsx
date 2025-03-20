@@ -77,6 +77,7 @@ const Epreuves = () => {
                                 <Th>Passage</Th>
                                 <Th>Temps</Th>
                                 <Th>Pénalité</Th>
+                                <Th>Total</Th>
                                 <Th>Classement</Th>
                                 <Th>Statut</Th>
                                 <Th>Juger</Th>
@@ -95,6 +96,7 @@ const Epreuves = () => {
                                     <Td>{part.numero_passage}</Td>
                                     <Td>{part.temps} sec</Td>
                                     <Td>{part.penalite}</Td>
+                                    <Td>{part.temps_total}</Td>
                                     <Td>{part.classement}</Td>
                                     <Td>
                                         <StatusBadge status={part.couple.statut} />

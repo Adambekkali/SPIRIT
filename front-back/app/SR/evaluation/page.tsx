@@ -86,7 +86,7 @@ const EvaluationPage: React.FC = () => {
       
     };
 
-    if (participation.epreuve?.competition?.type === "CSO") {
+    if (participation.epreuve?.competition?.type === "Equifun") {
       results.temps_total += penalite;
     }
 
