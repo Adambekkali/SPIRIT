@@ -86,7 +86,7 @@ const Epreuves = () => {
     if (error) return <p className="text-center text-red-500">{error}</p>;
 
     return (
-        <div className="p-6 max-w-6xl mx-auto">
+        <div className="p-6 max-w-8xl mx-auto">
             <h1 className="text-2xl font-bold text-center mb-6">Liste des Épreuves</h1>
 
             {/* Filtre par compétition */}
@@ -121,7 +121,7 @@ const Epreuves = () => {
             {/* Tableau des épreuves avec largeur fixe */}
             <div className="bg-white shadow-md rounded-lg overflow-hidden">
                 <div className="overflow-x-auto" style={{ width: '100%' }}>
-                    <div style={{ minWidth: '1100px', minHeight: '400px' }}> {/* Largeur minimale fixe */}
+                    <div style={{ minWidth: '1400px', minHeight: '400px' }}> {/* Largeur minimale fixe */}
                         {filteredEpreuves.length > 0 ? (
                             <table className="w-full border-collapse">
                                 <thead>
