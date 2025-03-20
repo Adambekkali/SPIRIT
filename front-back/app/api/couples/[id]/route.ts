@@ -49,51 +49,30 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const id = parseInt(params.id);
-
     if (isNaN(id)) {
-      return NextResponse.json(
-        { error: "ID invalide" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "ID invalide" }, { status: 400 });
     }
 
     const body = await request.json();
+    const statutOptions = ["Partant", "En piste", "En bord de piste", "Non Partant", "Fini", "Éliminé"];
 
-    // Vérifier si le couple existe
-    const existingCouple = await prisma.couple.findUnique({
-      where: { id }
-    });
-
-    if (!existingCouple) {
-      return NextResponse.json(
-        { error: "Couple non trouvé" },
-        { status: 404 }
-      );
+    if (!body.statut || !statutOptions.includes(body.statut)) {
+      return NextResponse.json({ error: "Le champ statut est obligatoire et doit être une valeur valide" }, { status: 400 });
     }
 
-    // Mettre à jour les données du couple
     const updatedCouple = await prisma.couple.update({
       where: { id },
-      data: {
-        nom_cavalier: body.nom_cavalier,
-        prenom_cavalier: body.prenom_cavalier,
-        nom_cheval: body.nom_cheval,
-        coach: body.coach,
-        ecurie: body.ecurie,
-      }
+      data: { statut: body.statut },
     });
 
     return NextResponse.json(updatedCouple);
   } catch (error) {
-    console.error("Erreur lors de la mise à jour du couple :", error);
+    console.error("Erreur lors de la mise à jour du statut du couple:", error);
     return NextResponse.json(
-      { error: "Une erreur est survenue lors de la mise à jour du couple." },
+      { error: "Une erreur est survenue lors de la mise à jour du statut du couple" },
       { status: 500 }
     );
   }

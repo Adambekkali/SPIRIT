@@ -77,6 +77,7 @@ const Epreuves = () => {
                                 <Th>Passage</Th>
                                 <Th>Temps</Th>
                                 <Th>Pénalité</Th>
+                                <Th>Total</Th>
                                 <Th>Classement</Th>
                                 <Th>Statut</Th>
                                 <Th>Juger</Th>
@@ -95,6 +96,7 @@ const Epreuves = () => {
                                     <Td>{part.numero_passage}</Td>
                                     <Td>{part.temps} sec</Td>
                                     <Td>{part.penalite}</Td>
+                                    <Td>{part.temps_total}</Td>
                                     <Td>{part.classement}</Td>
                                     <Td>
                                         <StatusBadge status={part.couple.statut} />
@@ -104,9 +106,7 @@ const Epreuves = () => {
                                             className="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 cursor-pointer"
                                             onClick={() => {
                                                 const queryParams = new URLSearchParams({
-                                                    id: part.couple.id,
-                                                    epreuveId: selectedEpreuve.id,
-                                                    competitionId: selectedEpreuve.competition?.id,
+                                                    participation_id: part.id,
                                                 }).toString();
                                                 window.location.href = `SR/evaluation?${queryParams}`;
                                             }}
