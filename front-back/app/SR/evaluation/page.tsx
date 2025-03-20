@@ -98,6 +98,7 @@ const EvaluationPage: React.FC = () => {
       temps,
       penalite,
       couple_id: couple?.id || "echec recup id couple",
+      type_compete : epreuve?.competition?.type || "echec recup type competition",
     };
     console.log("Résultats:", results);
     resetTimer();
@@ -233,7 +234,7 @@ const EvaluationPage: React.FC = () => {
         </button>
       ) : (
         <div style={{ textAlign: "center" }}>
-          <h1 style={{ fontSize: "48px", margin: "20px 0" }}>Chrono: {temps}s</h1>
+          <h1 style={{ fontSize: "48px", margin: "20px 0" }}>Chrono : {temps}s</h1>
           <button
             onClick={timerRunning ? stopTimer : startTimer}
             style={{
@@ -304,14 +305,7 @@ const EvaluationPage: React.FC = () => {
                 >
                   -
                 </button>
-              </div>
-            ) : (
-              <div>
-                <h1>compete Equifun</h1>
-              </div>
-            )}
-          </div>
-          <p
+                <p
             style={{
               fontSize: "24px",
               fontWeight: "bold",
@@ -320,6 +314,36 @@ const EvaluationPage: React.FC = () => {
           >
             Pénalités: {penalite}
           </p>
+              </div>
+            ) : (
+              <div>
+
+                <p
+            style={{
+              fontSize: "24px",
+              fontWeight: "bold",
+              marginBottom: "20px",
+            }}
+          >
+            Pénalités en secondes : 
+          </p> 
+                <input
+                  type="number"
+                  value={penalite}
+                  onChange={(e) => SetPenalite(Math.max(0, parseInt(e.target.value) || 0))}
+                  style={{
+                    padding: "10px",
+                    fontSize: "18px",
+                    border: "1px solid #ccc",
+                    borderRadius: "5px",
+                    width: "80px",
+                    textAlign: "center",
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
           <button
             onClick={handleSaveResults}
             style={{
