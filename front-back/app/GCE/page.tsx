@@ -79,8 +79,6 @@ const Epreuves = () => {
                                 <Th>Pénalité</Th>
                                 <Th>Classement</Th>
                                 <Th>Statut</Th>
-                                <Th>Juger</Th>
-                                <Th>Modifier</Th>
                             </tr>
                         </thead>
                         <tbody>
@@ -98,34 +96,6 @@ const Epreuves = () => {
                                     <Td>{part.classement}</Td>
                                     <Td>
                                         <StatusBadge status={part.couple.statut} />
-                                    </Td>
-                                    <Td>
-                                        <button
-                                            className="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 cursor-pointer"
-                                            onClick={() => {
-                                                const queryParams = new URLSearchParams({
-                                                    id: part.couple.id,
-                                                    epreuveId: selectedEpreuve.id,
-                                                    competitionId: selectedEpreuve.competition?.id,
-                                                }).toString();
-                                                window.location.href = `SR/evaluation?${queryParams}`;
-                                            }}
-                                        >
-                                            Juger
-                                        </button>
-                                    </Td>
-                                    <Td>
-                                        <button
-                                            className="bg-yellow-500 text-white px-4 py-1 rounded-md hover:bg-yellow-600 cursor-pointer"
-                                            onClick={() => {
-                                                const queryParams = new URLSearchParams({
-                                                    id: part.couple.id,
-                                                }).toString();
-                                                window.location.href = `SR/modifier?${queryParams}`;
-                                            }}
-                                        >
-                                            Modifier
-                                        </button>
                                     </Td>
                                 </tr>
                             ))}
