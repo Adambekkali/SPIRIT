@@ -1,5 +1,5 @@
 ======================================================================
-RAPPORT DE TEST - 2025-03-21 11:19:38
+RAPPORT DE TEST - 2025-03-21 15:39:39
 ======================================================================
 
 RÉSUMÉ GÉNÉRAL:
@@ -9,9 +9,9 @@ RÉSUMÉ GÉNÉRAL:
   Taux de réussite: 100.0%
 
 TESTS RÉUSSIS:
-  1. Connexion échouée - Durée: 4.92 secondes
-  2. Validation du formulaire vide - Durée: 3.13 secondes
-  3. Connexion réussie - Durée: 2.20 secondes
+  1. Connexion échouée - Durée: 4.68 secondes
+  2. Validation du formulaire vide - Durée: 3.28 secondes
+  3. Connexion réussie - Durée: 2.48 secondes
 
 TESTS ÉCHOUÉS:
   Aucun test échoué
@@ -22,8 +22,8 @@ DÉTAILS DES TESTS
 
 TEST: Connexion échouée
   Statut: RÉUSSI
-  Horodatage: 2025-03-21 11:19:31
-  Durée: 4.92 secondes
+  Horodatage: 2025-03-21 15:39:32
+  Durée: 4.68 secondes
   Logs:
     
 [TEST] Connexion échouée
@@ -47,8 +47,8 @@ TEST: Connexion échouée
 
 TEST: Validation du formulaire vide
   Statut: RÉUSSI
-  Horodatage: 2025-03-21 11:19:35
-  Durée: 3.13 secondes
+  Horodatage: 2025-03-21 15:39:36
+  Durée: 3.28 secondes
   Logs:
     
 [TEST] Validation du formulaire vide
@@ -65,8 +65,8 @@ TEST: Validation du formulaire vide
 
 TEST: Connexion réussie
   Statut: RÉUSSI
-  Horodatage: 2025-03-21 11:19:38
-  Durée: 2.20 secondes
+  Horodatage: 2025-03-21 15:39:39
+  Durée: 2.48 secondes
   Logs:
     
 [TEST] Connexion réussie
