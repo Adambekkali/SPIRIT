@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import React, { useEffect, useState, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -10,12 +9,19 @@ interface Competition {
     type: string;
 }
 
+interface Participer {
+    id: number;
+    epreuve_id: number;
+    equipe_id: number;
+    resultat: string;
+}
+
 interface Epreuve {
     id: number;
     intitule: string;
     statut: string;
     competition: Competition;
-    participations: any[];
+    participations: Participer[];
     competition_id?: number;
     numero_ordre?: number;
 }
@@ -328,7 +334,7 @@ const Epreuves = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Numéro d'ordre</label>
+                            <label className="block text-sm font-medium text-gray-700">{`Numéro d'ordre`}</label>
                             <input
                                 type="number"
                                 value={newEpreuve.numero_ordre}

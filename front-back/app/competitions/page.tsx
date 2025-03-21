@@ -33,7 +33,7 @@ const fetchCompetitions = async (): Promise<Competition[]> => {
     
     // Pour chaque compétition, récupérer ses épreuves
     const competitionsWithEpreuves = await Promise.all(
-      data.competitions.map(async (comp: any) => {
+      data.competitions.map(async (comp: Competition) => {
         const epreuvesResponse = await fetch(
           `http://localhost:3000/api/epreuves?competition_id=${comp.id}`
         );
@@ -98,11 +98,6 @@ export default function SelectCompetition() {
     loadCompetitions();
   }, []);
 
-  const handleSelectCompetition = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
-    setSelectedCompetition(value ? Number(value) : null);
-  };
-
   const handleCreateCompetition = async (event: React.FormEvent) => {
     event.preventDefault();
     setFormError(null);
@@ -156,7 +151,7 @@ export default function SelectCompetition() {
   }
 
   return (
-    <div className="flex h-screen">
+    <div className="flex flex-1">
       <div className="grid grid-cols-2 w-full">
         {/* Tableau des compétitions - Colonne de gauche */}
         <div className="border-r border-gray-300 p-6 overflow-auto">
@@ -253,9 +248,9 @@ export default function SelectCompetition() {
         </div>
 
         {/* Détails de la compétition - Colonne de droite */}
-        <div className="p-6">
+        <div className="p-6 fixed top-0 bottom-0 left-1/2 right-0 flex flex-col justify-center items-center">
           {selectedCompetition ? (
-            <div>
+            <div className="fixed w-[40%]">
               <h2 className="text-xl font-bold mb-4">Détails de la compétition</h2>
               <div className="bg-white shadow-md rounded-lg p-6">
                 <p className="text-lg font-semibold mb-4">Veuillez sélectionner une compétition</p>
@@ -297,7 +292,7 @@ export default function SelectCompetition() {
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-center h-full">
+            <div className="fixed flex items-center justify-center h-full">
               <p className="text-gray-500">Veuillez sélectionner une compétition</p>
             </div>
           )}
