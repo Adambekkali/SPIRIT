@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext"; // Import the AuthContext
 
 // Types pour améliorer la sécurité et l'autocomplétion
 interface Competition {
@@ -41,6 +42,7 @@ const getCompetitions = async () => {
 };
 
 const Epreuves = () => {
+    const { user } = useAuth(); // Get the user from the AuthContext
     const [allEpreuves, setAllEpreuves] = useState<Epreuve[]>([]);
     const [competitions, setCompetitions] = useState<Competition[]>([]);
     const [loading, setLoading] = useState(true);
@@ -333,38 +335,40 @@ const Epreuves = () => {
                 </div>
             </div>
 
-            {/* Bouton pour afficher le formulaire */}
-            <div className="flex justify-end mb-4">
-                {!deleteMode && (
-                    <button
-                        onClick={toggleShowForm}
-                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
-                    >
-                        {showForm ? "Annuler" : "+"}
-                    </button>
-                )}
-                {!showForm && (
-                    <button
-                        onClick={toggleDeleteMode}
-                        className={`ml-2 px-4 py-2 rounded-md transition ${
-                            deleteMode ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-red-500 text-white hover:bg-red-600"
-                        }`}
-                    >
-                        {deleteMode ? "Annuler" : "-"}
-                    </button>
-                )}
-                {deleteMode && (
-                    <button
-                        onClick={() => setConfirmDelete(true)}
-                        className="ml-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
-                    >
-                        Supprimer
-                    </button>
-                )}
-            </div>
+            {/* Boutons pour afficher le formulaire ou activer le mode suppression */}
+            {user?.type === "administrateur" && (
+                <div className="flex justify-end mb-4">
+                    {!deleteMode && (
+                        <button
+                            onClick={toggleShowForm}
+                            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+                        >
+                            {showForm ? "Annuler" : "+"}
+                        </button>
+                    )}
+                    {!showForm && (
+                        <button
+                            onClick={toggleDeleteMode}
+                            className={`ml-2 px-4 py-2 rounded-md transition ${
+                                deleteMode ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-red-500 text-white hover:bg-red-600"
+                            }`}
+                        >
+                            {deleteMode ? "Annuler" : "-"}
+                        </button>
+                    )}
+                    {deleteMode && (
+                        <button
+                            onClick={() => setConfirmDelete(true)}
+                            className="ml-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+                        >
+                            Supprimer
+                        </button>
+                    )}
+                </div>
+            )}
 
             {/* Formulaire de création d'épreuve */}
-            {showForm && (
+            {user?.type === "administrateur" && showForm && (
                 <div className="bg-white p-4 rounded-lg shadow mb-6">
                     <h2 className="text-lg font-semibold mb-4">Créer une nouvelle épreuve</h2>
                     <form onSubmit={handleCreateEpreuve} className="space-y-4">
@@ -448,7 +452,7 @@ const Epreuves = () => {
                             <table className="w-full border-collapse">
                                 <thead>
                                     <tr className="bg-gray-50 border-b border-gray-200">
-                                        {deleteMode && <Th width="5%" children={undefined}></Th>}
+                                        {deleteMode && user?.type === "administrateur" && <Th width="5%" children={undefined}></Th>}
                                         <Th width="5%">#</Th>
                                         <Th width="20%">Intitulé</Th>
                                         <Th width="20%">Compétition</Th>
@@ -466,7 +470,7 @@ const Epreuves = () => {
                                             }`}
                                             onClick={() => !deleteMode && router.push(`/epreuves/${epreuve.id}`)}
                                         >
-                                            {deleteMode && (
+                                            {deleteMode && user?.type === "administrateur" && (
                                                 <td className="px-4 py-3">
                                                     <input
                                                         type="checkbox"
@@ -490,8 +494,8 @@ const Epreuves = () => {
                                             <Td>
                                                 <StatusBadge 
                                                     status={epreuve.statut} 
-                                                    onClick={(e) => openStatusModal(epreuve, e)} 
-                                                    disabled={updatingId === epreuve.id}
+                                                    onClick={user?.type === "administrateur" ? (e) => openStatusModal(epreuve, e) : undefined} 
+                                                    disabled={updatingId === epreuve.id || user?.type !== "administrateur"}
                                                 />
                                             </Td>
                                             <Td>{epreuve.participations.length}</Td>
@@ -544,7 +548,7 @@ const Epreuves = () => {
             </div>
 
             {/* Modal de sélection de statut avec arrière-plan flou */}
-            {statusModalOpen && selectedEpreuve && (
+            {statusModalOpen && selectedEpreuve && user?.type === "administrateur" && (
                 <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50">
                     <div 
                         className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full" 
@@ -590,7 +594,7 @@ const Epreuves = () => {
             )}
 
             {/* Modal de confirmation de suppression */}
-            {confirmDelete && (
+            {confirmDelete && user?.type === "administrateur" && (
                 <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
                         <h3 className="text-xl font-bold mb-4">Confirmer la suppression</h3>

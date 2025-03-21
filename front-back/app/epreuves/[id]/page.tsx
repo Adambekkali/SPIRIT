@@ -2,6 +2,7 @@
 
 import React, { Usable, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext"; // Import the AuthContext
 
 interface Couple {
   id: number;
@@ -36,6 +37,7 @@ interface Epreuve {
 }
 
 const Epreuves = ({ params }: { params: Usable<{ id: string }> }) => {
+  const { user } = useAuth(); // Get the user from the AuthContext
   const [epreuve, setEpreuve] = useState<Epreuve | null>(null);
   const [couples, setCouples] = useState<Couple[]>([]);
   const [showCouples, setShowCouples] = useState(false);
@@ -165,7 +167,9 @@ const Epreuves = ({ params }: { params: Usable<{ id: string }> }) => {
                 <Th>Pénalité</Th>
                 <Th>Total</Th>
                 <Th>Classement</Th>
-                <Th>Action</Th>
+                {user?.type === "administrateur" && (
+                  <Th>Action</Th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -177,14 +181,16 @@ const Epreuves = ({ params }: { params: Usable<{ id: string }> }) => {
                   <Td>{participation.penalite ?? "-"}</Td>
                   <Td>{participation.temps_total ? `${participation.temps_total} sec` : "-"}</Td>
                   <Td>{participation.classement ?? "-"}</Td>
-                  <Td>
-                    <button
-                      onClick={() => handleRemoveParticipant(participation.id)}
-                      className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-                    >
-                      Supprimer
-                    </button>
-                  </Td>
+                  {user?.type === "administrateur" && (
+                    <Td>
+                      <button
+                        onClick={() => handleRemoveParticipant(participation.id)}
+                        className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                      >
+                        Supprimer
+                      </button>
+                    </Td>
+                  )}
                 </tr>
               ))}
               {epreuve.participations.length === 0 && (
@@ -199,47 +205,49 @@ const Epreuves = ({ params }: { params: Usable<{ id: string }> }) => {
         </div>
       </div>
 
-      <div className="bg-white shadow-md rounded-lg p-6">
-        <button
-          onClick={() => setShowCouples(!showCouples)}
-          className="mb-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-        >
-          {showCouples ? "Masquer la liste des couples" : "Afficher la liste des couples"}
-        </button>
-        {showCouples && (
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-gray-300">
-              <thead>
-                <tr className="bg-gray-100">
-                  <Th>Nom du cavalier</Th>
-                  <Th>Prénom du cavalier</Th>
-                  <Th>Coach</Th>
-                  <Th>Écurie</Th>
-                  <Th>Action</Th>
-                </tr>
-              </thead>
-              <tbody>
-                {couples.map((couple) => (
-                  <tr key={couple.id} className="border-t hover:bg-gray-50">
-                    <Td>{couple.nom_cavalier}</Td>
-                    <Td>{couple.prenom_cavalier}</Td>
-                    <Td>{couple.coach}</Td>
-                    <Td>{couple.ecurie}</Td>
-                    <Td>
-                      <button
-                        onClick={() => handleAddParticipant(couple.id)}
-                        className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
-                      >
-                        Ajouter
-                      </button>
-                    </Td>
+      {user?.type === "administrateur" && (
+        <div className="bg-white shadow-md rounded-lg p-6">
+          <button
+            onClick={() => setShowCouples(!showCouples)}
+            className="mb-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          >
+            {showCouples ? "Masquer la liste des couples" : "Afficher la liste des couples"}
+          </button>
+          {showCouples && (
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse border border-gray-300">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <Th>Nom du cavalier</Th>
+                    <Th>Prénom du cavalier</Th>
+                    <Th>Coach</Th>
+                    <Th>Écurie</Th>
+                    <Th>Action</Th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+                </thead>
+                <tbody>
+                  {couples.map((couple) => (
+                    <tr key={couple.id} className="border-t hover:bg-gray-50">
+                      <Td>{couple.nom_cavalier}</Td>
+                      <Td>{couple.prenom_cavalier}</Td>
+                      <Td>{couple.coach}</Td>
+                      <Td>{couple.ecurie}</Td>
+                      <Td>
+                        <button
+                          onClick={() => handleAddParticipant(couple.id)}
+                          className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+                        >
+                          Ajouter
+                        </button>
+                      </Td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
