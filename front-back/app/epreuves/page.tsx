@@ -241,6 +241,45 @@ const Epreuves = () => {
         }
     };
 
+    const [deleteMode, setDeleteMode] = useState(false);
+    const [selectedEpreuves, setSelectedEpreuves] = useState<number[]>([]);
+    const [confirmDelete, setConfirmDelete] = useState(false);
+
+    const toggleDeleteMode = () => {
+        setDeleteMode(!deleteMode);
+        setShowForm(false); // Ensure the form is hidden when entering delete mode
+        setSelectedEpreuves([]);
+        setConfirmDelete(false);
+    };
+
+    const toggleShowForm = () => {
+        setShowForm(!showForm);
+        setDeleteMode(false); // Ensure delete mode is disabled when showing the form
+    };
+
+    const handleSelectEpreuve = (id: number) => {
+        setSelectedEpreuves((prev) =>
+            prev.includes(id) ? prev.filter((epreuveId) => epreuveId !== id) : [...prev, id]
+        );
+    };
+
+    const handleDeleteEpreuves = async () => {
+        try {
+            for (const id of selectedEpreuves) {
+                await fetch(`/api/epreuves/${id}`, { method: "DELETE" });
+            }
+            setAllEpreuves((prev) => prev.filter((epreuve) => !selectedEpreuves.includes(epreuve.id)));
+            showNotification("Épreuves supprimées avec succès", "success");
+        } catch (err) {
+            console.error(err);
+            showNotification("Erreur lors de la suppression des épreuves", "error");
+        } finally {
+            setConfirmDelete(false);
+            setDeleteMode(false);
+            setSelectedEpreuves([]);
+        }
+    };
+
     if (loading) return <p className="text-center text-gray-500">Chargement des épreuves...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
 
@@ -290,12 +329,32 @@ const Epreuves = () => {
 
             {/* Bouton pour afficher le formulaire */}
             <div className="flex justify-end mb-4">
-                <button
-                    onClick={() => setShowForm(!showForm)}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
-                >
-                    {showForm ? "Annuler" : "+"}
-                </button>
+                {!deleteMode && (
+                    <button
+                        onClick={toggleShowForm}
+                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+                    >
+                        {showForm ? "Annuler" : "+"}
+                    </button>
+                )}
+                {!showForm && (
+                    <button
+                        onClick={toggleDeleteMode}
+                        className={`ml-2 px-4 py-2 rounded-md transition ${
+                            deleteMode ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-red-500 text-white hover:bg-red-600"
+                        }`}
+                    >
+                        {deleteMode ? "Annuler" : "-"}
+                    </button>
+                )}
+                {deleteMode && (
+                    <button
+                        onClick={() => setConfirmDelete(true)}
+                        className="ml-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+                    >
+                        Supprimer
+                    </button>
+                )}
             </div>
 
             {/* Formulaire de création d'épreuve */}
@@ -383,6 +442,7 @@ const Epreuves = () => {
                             <table className="w-full border-collapse">
                                 <thead>
                                     <tr className="bg-gray-50 border-b border-gray-200">
+                                        {deleteMode && <Th width="5%" children={undefined}></Th>}
                                         <Th width="5%">#</Th>
                                         <Th width="20%">Intitulé</Th>
                                         <Th width="20%">Compétition</Th>
@@ -395,9 +455,20 @@ const Epreuves = () => {
                                     {paginatedEpreuves.map((epreuve, index) => (
                                         <tr 
                                             key={epreuve.id} 
-                                            className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition"
-                                            onClick={() => router.push(`/epreuves/${epreuve.id}`)}
+                                            className={`border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition ${
+                                                deleteMode && selectedEpreuves.includes(epreuve.id) ? "bg-red-100" : ""
+                                            }`}
+                                            onClick={() => !deleteMode && router.push(`/epreuves/${epreuve.id}`)}
                                         >
+                                            {deleteMode && (
+                                                <td className="px-4 py-3">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedEpreuves.includes(epreuve.id)}
+                                                        onChange={() => handleSelectEpreuve(epreuve.id)}
+                                                    />
+                                                </td>
+                                            )}
                                             <Td>{(currentPage - 1) * itemsPerPage + index + 1}</Td>
                                             <Td>{epreuve.intitule}</Td>
                                             <Td>{epreuve.competition?.intitule}</Td>
@@ -506,6 +577,30 @@ const Epreuves = () => {
                                 onClick={closeStatusModal}
                             >
                                 Annuler
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal de confirmation de suppression */}
+            {confirmDelete && (
+                <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                        <h3 className="text-xl font-bold mb-4">Confirmer la suppression</h3>
+                        <p className="mb-6">Êtes-vous sûr de vouloir supprimer les épreuves sélectionnées ?</p>
+                        <div className="flex justify-end space-x-4">
+                            <button
+                                onClick={() => setConfirmDelete(false)}
+                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                onClick={handleDeleteEpreuves}
+                                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                            >
+                                Supprimer
                             </button>
                         </div>
                     </div>
