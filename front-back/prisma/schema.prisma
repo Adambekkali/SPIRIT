@@ -70,7 +70,6 @@ model Couple {
   numero_sire       String               @unique @db.VarChar(50)
   nom_cheval        String               @db.VarChar(255)
   numero_passage    String               @db.VarChar(255)
-  statut            StatutParticipation  @default(Partant)
   participations    Participer[]
 
   @@map("Couple")
@@ -94,6 +93,7 @@ model Participer {
   couple          Couple    @relation(fields: [couple_id], references: [id], onDelete: Cascade)
   couple_id       Int
   numero_passage  Int
+  statut          StatutParticipation  @default(Partant)
   temps           Decimal?  @db.Decimal(5, 2)
   penalite        Int?
   temps_total     Decimal?  @db.Decimal(5, 2)

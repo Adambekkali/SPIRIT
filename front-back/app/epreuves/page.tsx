@@ -176,6 +176,71 @@ const Epreuves = () => {
         setCurrentPage(1);
     };
 
+    const [showForm, setShowForm] = useState(false);
+    const [newEpreuve, setNewEpreuve] = useState({
+        intitule: "",
+        competition_id: competitionId ? parseInt(competitionId) : "",
+        numero_ordre: 1,
+        statut: "A_venir",
+        type: "",
+    });
+    const [formError, setFormError] = useState<string | null>(null);
+
+    const handleCompetitionChange = (competitionId: string) => {
+        if (!competitionId) {
+            setNewEpreuve({ ...newEpreuve, competition_id: "", numero_ordre: 1 });
+            return;
+        }
+    
+        // Automatically calculate the next numero_ordre for the selected competition
+        const maxNumeroOrdre = allEpreuves
+          .filter((epreuve) => epreuve.competition?.id?.toString() === competitionId)
+          .reduce((max, epreuve) => Math.max(max, epreuve.numero_ordre || 0), 0);
+    
+        setNewEpreuve({ ...newEpreuve, competition_id: competitionId, numero_ordre: maxNumeroOrdre + 1 });
+      };
+
+    const handleCreateEpreuve = async (event: React.FormEvent) => {
+        event.preventDefault();
+        setFormError(null);
+
+        if (!newEpreuve.intitule || !newEpreuve.competition_id || !newEpreuve.numero_ordre || !newEpreuve.type) {
+            setFormError("Tous les champs sont obligatoires.");
+            return;
+        }
+
+        try {
+            const response = await fetch("http://localhost:3000/api/epreuves", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    ...newEpreuve,
+                    competition_id: parseInt(newEpreuve.competition_id as string), // Ensure competition_id is a number
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                setFormError(errorData.error || "Erreur lors de la création de l'épreuve.");
+                return;
+            }
+
+            const createdEpreuve = await response.json();
+            setAllEpreuves((prev) => [...prev, createdEpreuve]);
+            setNewEpreuve({
+                intitule: "",
+                competition_id: "",
+                numero_ordre: 1,
+                statut: "A_venir",
+                type: "",
+            });
+            setShowForm(false);
+        } catch (err) {
+            setFormError("Une erreur est survenue.");
+            console.error(err);
+        }
+    };
+
     if (loading) return <p className="text-center text-gray-500">Chargement des épreuves...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
 
@@ -222,6 +287,93 @@ const Epreuves = () => {
                     ))}
                 </div>
             </div>
+
+            {/* Bouton pour afficher le formulaire */}
+            <div className="flex justify-end mb-4">
+                <button
+                    onClick={() => setShowForm(!showForm)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+                >
+                    {showForm ? "Annuler" : "+"}
+                </button>
+            </div>
+
+            {/* Formulaire de création d'épreuve */}
+            {showForm && (
+                <div className="bg-white p-4 rounded-lg shadow mb-6">
+                    <h2 className="text-lg font-semibold mb-4">Créer une nouvelle épreuve</h2>
+                    <form onSubmit={handleCreateEpreuve} className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Intitulé</label>
+                            <input
+                                type="text"
+                                value={newEpreuve.intitule}
+                                onChange={(e) => setNewEpreuve({ ...newEpreuve, intitule: e.target.value })}
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Compétition</label>
+                            <select
+                                value={newEpreuve.competition_id}
+                                onChange={(e) => handleCompetitionChange(e.target.value)}
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                            >
+                                <option value="">Sélectionnez une compétition</option>
+                                {competitions.map((comp) => (
+                                    <option key={comp.id} value={comp.id.toString()}>
+                                        {comp.intitule}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Numéro d'ordre</label>
+                            <input
+                                type="number"
+                                value={newEpreuve.numero_ordre}
+                                onChange={(e) =>
+                                    setNewEpreuve({ ...newEpreuve, numero_ordre: parseInt(e.target.value) })
+                                }
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                readOnly // Make it read-only since it's auto-calculated
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Type</label>
+                            <select
+                                value={newEpreuve.type}
+                                onChange={(e) => setNewEpreuve({ ...newEpreuve, type: e.target.value })}
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                            >
+                                <option value="">Sélectionnez un type</option>
+                                <option value="CSO">CSO</option>
+                                <option value="Equifun">Equifun</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Statut</label>
+                            <select
+                                value={newEpreuve.statut}
+                                onChange={(e) => setNewEpreuve({ ...newEpreuve, statut: e.target.value })}
+                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                            >
+                                <option value="A_venir">À venir</option>
+                                <option value="En_cours">En cours</option>
+                                <option value="Terminee">Terminée</option>
+                                <option value="Cloturee">Clôturée</option>
+                            </select>
+                        </div>
+                        {formError && <p className="text-red-500 text-sm">{formError}</p>}
+                        <button
+                            type="submit"
+                            className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition"
+                        >
+                            Créer
+                        </button>
+                    </form>
+                </div>
+            )}
 
             {/* Tableau des épreuves avec largeur fixe */}
             <div className="bg-white shadow-md rounded-lg overflow-hidden">

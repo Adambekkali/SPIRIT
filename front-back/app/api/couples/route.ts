@@ -11,18 +11,25 @@ export async function GET() {
       include: {
         participations: {
           include: {
-            epreuve: true
-          }
-        }
-      }
+            epreuve: true,
+          },
+        },
+      },
     });
 
+    // Retourner les couples sous forme de réponse JSON
     return NextResponse.json(couples, { status: 200 });
   } catch (error) {
     console.error("Erreur lors de la récupération des couples:", error);
-    return NextResponse.json({ error: 'Erreur lors de la récupération des couples.' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erreur lors de la récupération des couples." },
+      { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
   }
 }
+
 
 // Route POST pour créer un nouveau couple
 export async function POST(req: NextRequest) {
@@ -37,7 +44,6 @@ export async function POST(req: NextRequest) {
       "nom_cheval",
       "coach",
       "ecurie",
-      "statut",
     ];
     for (const field of requiredFields) {
       if (!body[field]) {
@@ -68,7 +74,6 @@ export async function POST(req: NextRequest) {
         nom_cheval: body.nom_cheval,
         coach: body.coach,
         ecurie: body.ecurie,
-        statut: body.statut,
         numero_sire: body.numero_sire || null, // Optional field
         numero_passage: body.numero_passage || null, // Optional field
       },

@@ -119,7 +119,6 @@ async function main() {
       numero_sire: 'S12345678',
       nom_cheval: 'Éclair Noir',
       numero_passage: 'P001',
-      statut: 'Partant',
     },
   })
 
@@ -135,7 +134,6 @@ async function main() {
       numero_sire: 'S12345679',
       nom_cheval: 'Tornado',
       numero_passage: 'P002',
-      statut: 'Partant',
     },
   })
 
@@ -151,7 +149,6 @@ async function main() {
       numero_sire: 'S12345680',
       nom_cheval: 'Espoir',
       numero_passage: 'P003',
-      statut: 'Partant',
     },
   })
 
@@ -167,7 +164,6 @@ async function main() {
       numero_sire: 'S12345681',
       nom_cheval: 'Ouragan',
       numero_passage: 'P004',
-      statut: 'Partant',
     },
   })
 
@@ -183,7 +179,6 @@ async function main() {
       numero_sire: 'S12345682',
       nom_cheval: 'Tempête',
       numero_passage: 'P005',
-      statut: 'Partant',
     },
   })
 
@@ -199,7 +194,6 @@ async function main() {
       numero_sire: 'S12345683',
       nom_cheval: 'Victoire',
       numero_passage: 'P006',
-      statut: 'Partant',
     },
   })
 
@@ -215,7 +209,6 @@ async function main() {
       numero_sire: 'S12345684',
       nom_cheval: 'Jupiter',
       numero_passage: 'P007',
-      statut: 'Partant',
     },
   })
 
@@ -231,7 +224,6 @@ async function main() {
       numero_sire: 'S12345685',
       nom_cheval: 'Étoile Filante',
       numero_passage: 'P008',
-      statut: 'Partant',
     },
   })
 
@@ -247,7 +239,6 @@ async function main() {
       numero_sire: 'S12345686',
       nom_cheval: 'Comète',
       numero_passage: 'P009',
-      statut: 'Partant',
     },
   })
 
@@ -263,7 +254,6 @@ async function main() {
       numero_sire: 'S12345687',
       nom_cheval: 'Tonnerre',
       numero_passage: 'P010',
-      statut: 'Partant',
     },
   })
 
@@ -324,6 +314,7 @@ async function main() {
       epreuve_id: epreuve1.id,
       couple_id: couple1.id,
       numero_passage: 1,
+      statut: 'Partant',
       temps: 65.32,
       penalite: 4,
       temps_total: 69.32,
@@ -336,6 +327,7 @@ async function main() {
       epreuve_id: epreuve1.id,
       couple_id: couple2.id,
       numero_passage: 2,
+      statut: 'Partant',
       temps: 63.45,
       penalite: 0,
       temps_total: 63.45,
@@ -348,6 +340,7 @@ async function main() {
       epreuve_id: epreuve1.id,
       couple_id: couple3.id,
       numero_passage: 3,
+      statut: 'Partant',
       temps: 68.11,
       penalite: 8,
       temps_total: 76.11,
@@ -360,6 +353,7 @@ async function main() {
       epreuve_id: epreuve2.id,
       couple_id: couple4.id,
       numero_passage: 1,
+      statut: 'Partant',
     },
   })
 
@@ -368,6 +362,7 @@ async function main() {
       epreuve_id: epreuve2.id,
       couple_id: couple5.id,
       numero_passage: 2,
+      statut: 'Partant',
     },
   })
 
@@ -376,6 +371,7 @@ async function main() {
       epreuve_id: epreuve2.id,
       couple_id: couple6.id,
       numero_passage: 3,
+      statut: 'Partant',
     },
   })
 
@@ -384,6 +380,7 @@ async function main() {
       epreuve_id: epreuve3.id,
       couple_id: couple7.id,
       numero_passage: 1,
+      statut: 'Partant',
     },
   })
 
@@ -392,6 +389,7 @@ async function main() {
       epreuve_id: epreuve3.id,
       couple_id: couple8.id,
       numero_passage: 2,
+      statut: 'Partant',
     },
   })
 
@@ -400,6 +398,7 @@ async function main() {
       epreuve_id: epreuve4.id,
       couple_id: couple9.id,
       numero_passage: 1,
+      statut: 'Partant',
     },
   })
 
@@ -408,6 +407,7 @@ async function main() {
       epreuve_id: epreuve4.id,
       couple_id: couple10.id,
       numero_passage: 2,
+      statut: 'Partant',
     },
   })
 
