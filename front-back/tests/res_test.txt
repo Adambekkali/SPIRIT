@@ -1,5 +1,9 @@
 ======================================================================
+<<<<<<< HEAD
 RAPPORT DE TEST - 2025-03-21 15:39:39
+=======
+RAPPORT DE TEST - 2025-03-21 14:04:52
+>>>>>>> a66d1e3c2fe14aa705f0be91a7c23231c139e747
 ======================================================================
 
 RÉSUMÉ GÉNÉRAL:
@@ -9,9 +13,15 @@ RÉSUMÉ GÉNÉRAL:
   Taux de réussite: 100.0%
 
 TESTS RÉUSSIS:
+<<<<<<< HEAD
   1. Connexion échouée - Durée: 4.68 secondes
   2. Validation du formulaire vide - Durée: 3.28 secondes
   3. Connexion réussie - Durée: 2.48 secondes
+=======
+  1. Connexion échouée - Durée: 4.02 secondes
+  2. Validation du formulaire vide - Durée: 3.19 secondes
+  3. Connexion réussie - Durée: 1.57 secondes
+>>>>>>> a66d1e3c2fe14aa705f0be91a7c23231c139e747
 
 TESTS ÉCHOUÉS:
   Aucun test échoué
@@ -22,8 +32,13 @@ DÉTAILS DES TESTS
 
 TEST: Connexion échouée
   Statut: RÉUSSI
+<<<<<<< HEAD
   Horodatage: 2025-03-21 15:39:32
   Durée: 4.68 secondes
+=======
+  Horodatage: 2025-03-21 14:04:46
+  Durée: 4.02 secondes
+>>>>>>> a66d1e3c2fe14aa705f0be91a7c23231c139e747
   Logs:
     
 [TEST] Connexion échouée
@@ -47,8 +62,13 @@ TEST: Connexion échouée
 
 TEST: Validation du formulaire vide
   Statut: RÉUSSI
+<<<<<<< HEAD
   Horodatage: 2025-03-21 15:39:36
   Durée: 3.28 secondes
+=======
+  Horodatage: 2025-03-21 14:04:50
+  Durée: 3.19 secondes
+>>>>>>> a66d1e3c2fe14aa705f0be91a7c23231c139e747
   Logs:
     
 [TEST] Validation du formulaire vide
@@ -65,8 +85,13 @@ TEST: Validation du formulaire vide
 
 TEST: Connexion réussie
   Statut: RÉUSSI
+<<<<<<< HEAD
   Horodatage: 2025-03-21 15:39:39
   Durée: 2.48 secondes
+=======
+  Horodatage: 2025-03-21 14:04:52
+  Durée: 1.57 secondes
+>>>>>>> a66d1e3c2fe14aa705f0be91a7c23231c139e747
   Logs:
     
 [TEST] Connexion réussie

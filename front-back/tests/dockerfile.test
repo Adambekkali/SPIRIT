@@ -27,4 +27,4 @@ COPY check-services.sh /check-services.sh
 RUN chmod +x /check-services.sh
 
 # Par défaut, exécuter le script qui vérifie tous les services avant de lancer les tests
-CMD ["/check-services.sh"]
+CMD ["sh", "check-services.sh"]
