@@ -115,6 +115,7 @@ const EvaluationPage: React.FC = () => {
         throw new Error("Erreur lors du classement.");
       }
       console.log("Résultats enregistrés avec succès.");
+      window.location.href = `/SR?selected_epreuve=${participation?.epreuve_id}`;
     } catch (error) {
       console.error("Erreur:", error);
     }
