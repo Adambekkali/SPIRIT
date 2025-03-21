@@ -1,5 +1,5 @@
 services:
-    # Service PostgreSQL
+  # Service PostgreSQL
   db:
     image: postgres:15-alpine
     ports:
@@ -10,23 +10,67 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=app_db
-     
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+       
   # Service frontend & backend Next.js
   front-back:
     build:
       context: ./front-back
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "3001:3000"  # Utilise le port 3001 en local pour éviter les conflits
     volumes:
       - ./front-back:/app
       - /app/node_modules
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       - NODE_ENV=development
       - PORT=3000
       - DATABASE_URL=postgres://postgres:postgres@db:5432/app_db
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+ 
+  # Service Selenium pour les tests automatisés
+  selenium:
+    image: selenium/standalone-chrome:latest
+    ports:
+      - "4444:4444"
+      - "7900:7900"  # Port pour VNC Viewer (accès visuel aux tests)
+    volumes:
+      - /dev/shm:/dev/shm # Pour éviter les erreurs de mémoire
+    environment:
+      - SE_NODE_MAX_SESSIONS=5
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:4444/wd/hub/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+     
+  # Service pour exécuter les tests Selenium
+  test-runner:
+    build:
+      context: ./front-back/tests
+      dockerfile: dockerfile.test
+    volumes:
+      - ./front-back/tests:/app/tests
+    depends_on:
+      selenium:
+        condition: service_healthy
+      front-back:
+        condition: service_healthy
+    environment:
+      - SELENIUM_REMOTE_URL=http://selenium:4444/wd/hub
+      - APP_URL=http://front-back:3000
 
 volumes:
   postgres_data:

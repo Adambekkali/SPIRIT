@@ -7,8 +7,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import TimeoutException
 
 # Pour suivre les résultats des tests
@@ -19,7 +17,7 @@ test_results = {
 }
 
 class LoginTest(unittest.TestCase):
-    """Test de la page de connexion avec logs verbeux et récapitulatif"""
+    """Test de la page de connexion avec logs détaillés"""
     
     def setUp(self):
         """Configuration initiale avant chaque test"""
@@ -32,12 +30,42 @@ class LoginTest(unittest.TestCase):
         chrome_options.add_argument('--ignore-ssl-errors=yes')
         chrome_options.add_argument('--ignore-certificate-errors')
         
-        print("Initialisation du driver Chrome...")
-        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+        # Désactiver complètement les erreurs SSL
+        chrome_options.add_argument('--allow-insecure-localhost')
+        chrome_options.add_argument('--disable-web-security')
+        
+        # Déterminer si nous sommes dans Docker ou en local
+        # Si SELENIUM_REMOTE_URL est défini, nous sommes dans Docker
+        # Sinon, nous utilisons un driver Chrome local
+        selenium_url = os.environ.get('SELENIUM_REMOTE_URL')
+        
+        if selenium_url:
+            # Mode Docker: utiliser le RemoteWebDriver
+            print(f"Mode Docker: Connexion au service Selenium: {selenium_url}")
+            self.driver = webdriver.Remote(
+                command_executor=selenium_url,
+                options=chrome_options
+            )
+        else:
+            # Mode local: utiliser Chrome en local
+            print("Mode local: Utilisation du driver Chrome local")
+            from selenium.webdriver.chrome.service import Service
+            from webdriver_manager.chrome import ChromeDriverManager
+            
+            self.driver = webdriver.Chrome(
+                service=Service(ChromeDriverManager().install()),
+                options=chrome_options
+            )
+        
         self.driver.maximize_window()
         self.driver.implicitly_wait(10)
         
-        self.base_url = "http://localhost:3000"
+        # URL de l'application - S'assurer d'utiliser HTTP explicitement
+        # Dans Docker: http://front-back:3000
+        # En local: http://localhost:3000
+        base_url = os.environ.get('APP_URL', 'http://localhost:3000')
+        # Forcer HTTP en remplaçant https par http si nécessaire
+        self.base_url = base_url.replace('https://', 'http://')
         print(f"URL de base configurée : {self.base_url}")
         
         # Pour collecter les logs de test
@@ -57,11 +85,12 @@ class LoginTest(unittest.TestCase):
         
         try:
             self.log(f"\n[TEST] {test_name}")
-            self.log(f"Accès à la page de connexion : {self.base_url}/auth/login")
-            driver.get(f"{self.base_url}/auth/login")
+            login_url = f"{self.base_url}/auth/login"
+            self.log(f"Accès à la page de connexion : {login_url}")
+            driver.get(login_url)
             
             self.log("Attente du chargement de la page...")
-            WebDriverWait(driver, 10).until(
+            WebDriverWait(driver, 30).until(  # Augmenté à 30 secondes
                 EC.presence_of_element_located((By.TAG_NAME, "form"))
             )
             self.log("Page de connexion chargée avec succès")
@@ -86,9 +115,9 @@ class LoginTest(unittest.TestCase):
             expected_url = self.base_url
             self.log(f"Attente de redirection vers : {expected_url}")
             
-            # Attendre la redirection avec un timeout de 15 secondes
+            # Attendre la redirection avec un timeout de 30 secondes
             try:
-                WebDriverWait(driver, 15).until(
+                WebDriverWait(driver, 30).until(  # Augmenté à 30 secondes
                     EC.url_contains(expected_url)
                 )
                 self.log("✅ Redirection réussie vers la page d'accueil")
@@ -148,11 +177,12 @@ class LoginTest(unittest.TestCase):
         
         try:
             self.log(f"\n[TEST] {test_name}")
-            self.log(f"Accès à la page de connexion : {self.base_url}/auth/login")
-            driver.get(f"{self.base_url}/auth/login")
+            login_url = f"{self.base_url}/auth/login"
+            self.log(f"Accès à la page de connexion : {login_url}")
+            driver.get(login_url)
             
             self.log("Attente du chargement de la page...")
-            WebDriverWait(driver, 10).until(
+            WebDriverWait(driver, 30).until(  # Augmenté à 30 secondes
                 EC.presence_of_element_located((By.TAG_NAME, "form"))
             )
             self.log("Page de connexion chargée avec succès")
@@ -239,11 +269,12 @@ class LoginTest(unittest.TestCase):
         
         try:
             self.log(f"\n[TEST] {test_name}")
-            self.log(f"Accès à la page de connexion : {self.base_url}/auth/login")
-            driver.get(f"{self.base_url}/auth/login")
+            login_url = f"{self.base_url}/auth/login"
+            self.log(f"Accès à la page de connexion : {login_url}")
+            driver.get(login_url)
             
             self.log("Attente du chargement de la page...")
-            WebDriverWait(driver, 10).until(
+            WebDriverWait(driver, 30).until(  # Augmenté à 30 secondes
                 EC.presence_of_element_located((By.TAG_NAME, "form"))
             )
             self.log("Page de connexion chargée avec succès")
@@ -292,15 +323,19 @@ class LoginTest(unittest.TestCase):
         self.log("----- Fin du test -----\n")
 
 def create_test_results_file():
-    """Crée un fichier texte avec les résultats des tests"""
+    """Crée un fichier texte avec les résultats des tests, en remplaçant l'ancien"""
     
     # Créer le dossier tests s'il n'existe pas
     if not os.path.exists('tests'):
         os.makedirs('tests')
     
-    # Nom du fichier avec horodatage
-    timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-    filename = f"tests/res_test_{timestamp}.txt"
+    # Supprimer tous les anciens fichiers de résultats
+    for f in os.listdir('tests'):
+        if f.startswith('res_test'):
+            os.remove(os.path.join('tests', f))
+    
+    # Nom du fichier fixe (sans horodatage)
+    filename = "tests/res_test.txt"
     
     with open(filename, 'w', encoding='utf-8') as f:
         f.write("="*70 + "\n")
@@ -391,6 +426,16 @@ def print_test_summary():
 
 if __name__ == "__main__":
     print("=== DÉBUT DES TESTS DE CONNEXION ===\n")
+    
+    # Supprimer les anciens fichiers de résultats avant de commencer les tests
+    if os.path.exists('tests'):
+        for f in os.listdir('tests'):
+            if f.startswith('res_test'):
+                try:
+                    os.remove(os.path.join('tests', f))
+                    print(f"Ancien fichier supprimé: {f}")
+                except Exception as e:
+                    print(f"Impossible de supprimer {f}: {e}")
     
     try:
         unittest.main(exit=False, verbosity=2)
