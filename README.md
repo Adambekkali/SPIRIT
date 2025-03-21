@@ -5,7 +5,7 @@
 Diego Montorier  
 Matheus Kops Guedes  
 Abdelali Imzilen  
-Adam Bequali  
+Adam Bekkali  
 Maïlys Poulain  
 
 
