@@ -3,7 +3,17 @@
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import QRCode from "qrcode";
 
+const generateQRCode = async (link: string) => {
+    try {
+        const qrCodeDataURL = await QRCode.toDataURL(link);
+        return qrCodeDataURL; // Retourne l'image du QR code sous forme de Data URL
+    } catch (err) {
+        console.error("Erreur lors de la génération du QR code :", err);
+        return null;
+    }
+};
 // Définition des types
 interface Epreuve {
   id: number;
@@ -19,6 +29,9 @@ interface Competition {
   type: string;
   epreuves: Epreuve[];
 }
+
+// Removed misplaced useEffect
+
 
 // Fonction pour récupérer les données depuis l'API
 const fetchCompetitions = async (): Promise<Competition[]> => {
@@ -84,6 +97,7 @@ export default function SelectCompetition() {
   const [showForm, setShowForm] = useState(false);
 
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [qrCodes, setQrCodes] = useState<{ [key: number]: string }>({});
 
   const handleDeleteCompetition = async (competitionId: number) => {
     try {
@@ -100,20 +114,43 @@ export default function SelectCompetition() {
   // Charger les compétitions depuis l'API
   useEffect(() => {
     const loadCompetitions = async () => {
-      try {
         setLoading(true);
-        const data = await fetchCompetitions();
-        setCompetitions(data);
-      } catch (err) {
-        setError("Erreur lors du chargement des compétitions");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+        try {
+            const data = await fetchCompetitions();
+            setCompetitions(data);
+        } catch (err) {
+            setError("Erreur lors du chargement des compétitions");
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     loadCompetitions();
-  }, []);
+}, []);
+
+useEffect(() => {
+  const generateQRCodes = async () => {
+      const newQRCodes: { [key: number]: string } = {};
+
+      for (const comp of competitions) {
+          const qrCodeDataURL = await generateQRCode(`http://localhost:3000/epreuves?competitionId=${comp.id}`);
+          if (qrCodeDataURL) {
+              newQRCodes[comp.id] = qrCodeDataURL;
+          }
+      }
+
+      setQrCodes(newQRCodes);
+  };
+
+  if (competitions.length > 0) {
+      generateQRCodes();
+  }
+}, [competitions]);
+
+
+
+
 
   const handleCreateCompetition = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -179,6 +216,7 @@ export default function SelectCompetition() {
                 <th className="text-left p-2">Numéro</th>
                 <th className="text-left p-2">Intitulé</th>
                 <th className="text-left p-2">Type</th>
+                <th>QR Code</th>
               </tr>
             </thead>
             <tbody>
@@ -193,6 +231,13 @@ export default function SelectCompetition() {
                   <td className="p-2">{comp.numero}</td>
                   <td className="p-2">{comp.intitule}</td>
                   <td className="p-2">{comp.type}</td>
+                  <td className="p-2">
+  {qrCodes[comp.id] ? (
+    <img src={qrCodes[comp.id]} alt={`QR Code for ${comp.numero}`} className="w-16 h-16" />
+  ) : (
+    <p>Génération...</p>
+  )}
+</td>
                 </tr>
               ))}
             </tbody>
@@ -280,7 +325,8 @@ export default function SelectCompetition() {
                       <p>Numéro : {competitions.find(comp => comp.id === selectedCompetition)?.numero}</p>
                       <p>Intitulé : {competitions.find(comp => comp.id === selectedCompetition)?.intitule}</p>
                       <p>Type : {competitions.find(comp => comp.id === selectedCompetition)?.type}</p>
-                    </div>
+                      
+                      </div>
 
                     {/* Boutons d'action */}
                     <div className="flex gap-4 mt-6">

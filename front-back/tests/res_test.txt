@@ -1,5 +1,5 @@
 ======================================================================
-RAPPORT DE TEST - 2025-03-20 16:14:15
+RAPPORT DE TEST - 2025-03-21 11:19:38
 ======================================================================
 
 RÉSUMÉ GÉNÉRAL:
@@ -9,9 +9,9 @@ RÉSUMÉ GÉNÉRAL:
   Taux de réussite: 100.0%
 
 TESTS RÉUSSIS:
-  1. Connexion échouée - Durée: 3.22 secondes
-  2. Validation du formulaire vide - Durée: 1.61 secondes
-  3. Connexion réussie - Durée: 0.71 secondes
+  1. Connexion échouée - Durée: 4.92 secondes
+  2. Validation du formulaire vide - Durée: 3.13 secondes
+  3. Connexion réussie - Durée: 2.20 secondes
 
 TESTS ÉCHOUÉS:
   Aucun test échoué
@@ -22,12 +22,12 @@ DÉTAILS DES TESTS
 
 TEST: Connexion échouée
   Statut: RÉUSSI
-  Horodatage: 2025-03-20 16:13:54
-  Durée: 3.22 secondes
+  Horodatage: 2025-03-21 11:19:31
+  Durée: 4.92 secondes
   Logs:
     
 [TEST] Connexion échouée
-    Accès à la page de connexion : http://localhost:3000/auth/login
+    Accès à la page de connexion : http://front-back:3000/auth/login
     Attente du chargement de la page...
     Page de connexion chargée avec succès
     Localisation des éléments du formulaire...
@@ -36,7 +36,7 @@ TEST: Connexion échouée
     Saisie d'un mot de passe invalide...
     Soumission du formulaire avec identifiants invalides...
     Attente pour le traitement de la requête...
-    ✅ L'utilisateur est resté sur la page de connexion : http://localhost:3000/auth/login
+    ✅ L'utilisateur est resté sur la page de connexion : http://front-back:3000/auth/login
     Vérification que le formulaire est toujours présent...
     ✅ Le formulaire de connexion est toujours affiché
     Vérification de l'absence du cookie d'authentification...
@@ -47,30 +47,30 @@ TEST: Connexion échouée
 
 TEST: Validation du formulaire vide
   Statut: RÉUSSI
-  Horodatage: 2025-03-20 16:14:04
-  Durée: 1.61 secondes
+  Horodatage: 2025-03-21 11:19:35
+  Durée: 3.13 secondes
   Logs:
     
 [TEST] Validation du formulaire vide
-    Accès à la page de connexion : http://localhost:3000/auth/login
+    Accès à la page de connexion : http://front-back:3000/auth/login
     Attente du chargement de la page...
     Page de connexion chargée avec succès
     Localisation du bouton de soumission...
     Tentative de soumission du formulaire sans saisie...
     Attente pour le traitement de la requête...
-    ✅ L'utilisateur est resté sur la page de connexion : http://localhost:3000/auth/login
+    ✅ L'utilisateur est resté sur la page de connexion : http://front-back:3000/auth/login
     Test de Validation du formulaire vide passé avec succès ✅
 
 ----------------------------------------------------------------------
 
 TEST: Connexion réussie
   Statut: RÉUSSI
-  Horodatage: 2025-03-20 16:14:13
-  Durée: 0.71 secondes
+  Horodatage: 2025-03-21 11:19:38
+  Durée: 2.20 secondes
   Logs:
     
 [TEST] Connexion réussie
-    Accès à la page de connexion : http://localhost:3000/auth/login
+    Accès à la page de connexion : http://front-back:3000/auth/login
     Attente du chargement de la page...
     Page de connexion chargée avec succès
     Localisation des éléments du formulaire...
@@ -78,9 +78,9 @@ TEST: Connexion réussie
     Saisie de l'email de test...
     Saisie du mot de passe...
     Soumission du formulaire de connexion...
-    Attente de redirection vers : http://localhost:3000
+    Attente de redirection vers : http://front-back:3000
     ✅ Redirection réussie vers la page d'accueil
-    URL actuelle : http://localhost:3000/auth/login
+    URL actuelle : http://front-back:3000/auth/login
     Liste de tous les cookies :
     Vérification du cookie d'authentification...
     ❌ Cookie d'authentification absent
