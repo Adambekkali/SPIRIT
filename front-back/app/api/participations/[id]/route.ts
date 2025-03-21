@@ -112,7 +112,7 @@ export async function PUT(
   } catch (error) {
     console.error("Erreur lors de la mise à jour de la participation:", error);
     return NextResponse.json(
-      { error: "Une erreur est survenue lors de la mise à jour de la participation" },
+      { error: "Une erreur est survenue lors de la mise à jour de la participation." },
       { status: 500 }
     );
   }
@@ -161,4 +161,32 @@ export async function DELETE(
       { status: 500 }
     );
   }
+}
+
+// PUT - Mettre à jour le statut d'une participation
+export async function updateParticipationStatus(request: NextRequest, { params }: { params: { id: string } }) {
+    try {
+        const participationId = parseInt(params.id);
+        if (isNaN(participationId)) {
+            return NextResponse.json({ error: "ID invalide" }, { status: 400 });
+        }
+
+        const { statut } = await request.json();
+        if (!statut) {
+            return NextResponse.json({ error: "Le champ 'statut' est obligatoire." }, { status: 400 });
+        }
+
+        const updatedParticipation = await prisma.participer.update({
+            where: { id: participationId },
+            data: { statut },
+        });
+
+        return NextResponse.json(updatedParticipation, { status: 200 });
+    } catch (error) {
+        console.error("Erreur lors de la mise à jour du statut de la participation:", error);
+        return NextResponse.json(
+            { error: "Une erreur est survenue lors de la mise à jour du statut." },
+            { status: 500 }
+        );
+    }
 }

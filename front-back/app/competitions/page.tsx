@@ -80,6 +80,20 @@ export default function SelectCompetition() {
   const [formError, setFormError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const handleDeleteCompetition = async (competitionId: number) => {
+    try {
+        await fetch(`/api/competitions/${competitionId}`, { method: "DELETE" });
+        setCompetitions((prev) => prev.filter((comp) => comp.id !== competitionId));
+        setSelectedCompetition(null);
+    } catch (err) {
+        console.error("Erreur lors de la suppression de la compétition:", err);
+    } finally {
+        setConfirmDelete(false);
+    }
+  };
+
   // Charger les compétitions depuis l'API
   useEffect(() => {
     const loadCompetitions = async () => {
@@ -287,6 +301,12 @@ export default function SelectCompetition() {
                         ) : null;
                       })()}
                     </div>
+                    <button
+                      onClick={() => setConfirmDelete(true)}
+                      className="mt-4 w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition"
+                    >
+                      Supprimer la compétition
+                    </button>
                   </>
                 )}
               </div>
@@ -298,6 +318,29 @@ export default function SelectCompetition() {
           )}
         </div>
       </div>
+      {/* Modal de confirmation de suppression */}
+      {confirmDelete && selectedCompetition && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                <h3 className="text-xl font-bold mb-4">Confirmer la suppression</h3>
+                <p className="mb-6">Êtes-vous sûr de vouloir supprimer cette compétition ?</p>
+                <div className="flex justify-end space-x-4">
+                    <button
+                        onClick={() => setConfirmDelete(false)}
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                    >
+                        Annuler
+                    </button>
+                    <button
+                        onClick={() => handleDeleteCompetition(selectedCompetition)}
+                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                    >
+                        Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+      )}
     </div>
   );
 }
