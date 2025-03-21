@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -70,6 +71,8 @@ export default function SelectCompetition() {
   const [selectedCompetition, setSelectedCompetition] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { user } = useAuth()
 
   // State for the new competition form
   const [newCompetition, setNewCompetition] = useState({
@@ -301,12 +304,14 @@ export default function SelectCompetition() {
                         ) : null;
                       })()}
                     </div>
-                    <button
-                      onClick={() => setConfirmDelete(true)}
-                      className="mt-4 w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition"
-                    >
-                      Supprimer la compétition
-                    </button>
+                    {(user?.type === "administrateur" || user?.type === "jury") && (
+                      <button
+                        onClick={() => setConfirmDelete(true)}
+                        className="mt-4 w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition"
+                      >
+                        Supprimer la compétition
+                      </button>
+                    )}
                   </>
                 )}
               </div>
