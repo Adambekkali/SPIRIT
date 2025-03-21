@@ -103,27 +103,10 @@ export async function PUT(
         temps: body.temps,
         penalite: body.penalite,
         temps_total: body.temps_total,
-        classement: body.classement
+        classement: body.classement,
+        statut: body.statut, // Update the statut field in Participer
       }
     });
-    
-    // Si on met à jour les résultats, mettre à jour le statut du couple
-    if (body.temps !== undefined || body.penalite !== undefined || body.temps_total !== undefined) {
-      // Récupérer le couple pour mettre à jour son statut
-      const participation = await prisma.participer.findUnique({
-        where: { id },
-        include: { couple: true }
-      });
-      
-      if (participation) {
-        await prisma.couple.update({
-          where: { id: participation.couple_id },
-          data: {
-            statut: 'Fini'
-          }
-        });
-      }
-    }
     
     return NextResponse.json(updatedParticipation);
   } catch (error) {

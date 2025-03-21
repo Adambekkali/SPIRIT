@@ -139,6 +139,7 @@ export async function POST(request: NextRequest) {
         epreuve_id: body.epreuve_id,
         couple_id: body.couple_id,
         numero_passage: body.numero_passage,
+        statut: body.statut || 'Partant', // Include statut field
         temps: body.temps || null,
         penalite: body.penalite || null,
         temps_total: body.temps_total || null,
