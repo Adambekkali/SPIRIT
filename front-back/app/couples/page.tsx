@@ -106,51 +106,6 @@ const Couples = () => {
         fetchCouples();
     }, []);
 
-    // Update couple status
-    const updateCoupleStatut = async (coupleId: number, newStatut: string) => {
-        try {
-            setUpdatingId(coupleId);
-            const response = await fetch(`/api/couples/${coupleId}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ statut: newStatut }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || "Erreur lors de la mise à jour du statut");
-            }
-
-            setCouples(couples.map((c) => (c.id === coupleId ? { ...c, statut: newStatut } : c)));
-            closeStatusModal();
-        } catch (err) {
-            console.error(err);
-            alert("Erreur lors de la mise à jour du statut");
-        } finally {
-            setUpdatingId(null);
-        }
-    };
-
-    // Open status modal
-    const openStatusModal = (couple: Couple) => {
-        setSelectedCouple(couple);
-        setStatusModalOpen(true);
-    };
-
-    // Close status modal
-    const closeStatusModal = () => {
-        setSelectedCouple(null);
-        setStatusModalOpen(false);
-    };
-
-    // Get badge color for status
-    const getStatutBadgeColor = (statut: string) => {
-        const option = statutOptions.find((opt) => opt.value === statut);
-        return option?.color || "#9CA3AF";
-    };
-
     if (loading) return <p className="text-center text-gray-500">Chargement des couples...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
 
@@ -236,7 +191,6 @@ const Couples = () => {
                                 <Th>Nom du cheval</Th>
                                 <Th>Coach</Th>
                                 <Th>Écurie</Th>
-                                <Th>Statut</Th>
                             </tr>
                         </thead>
                         <tbody>
@@ -248,21 +202,11 @@ const Couples = () => {
                                     <Td>{couple.nom_cheval}</Td>
                                     <Td>{couple.coach}</Td>
                                     <Td>{couple.ecurie}</Td>
-                                    <Td>
-                                        <button
-                                            className="px-2 py-1 rounded-full text-sm font-medium text-white"
-                                            style={{ backgroundColor: getStatutBadgeColor(couple.statut) }}
-                                            onClick={() => openStatusModal(couple)}
-                                            disabled={updatingId === couple.id}
-                                        >
-                                            {couple.statut}
-                                        </button>
-                                    </Td>
                                 </tr>
                             ))}
                             {couples.length === 0 && (
                                 <tr>
-                                    <td colSpan={7} className="border px-4 py-3 text-center text-gray-500">
+                                    <td colSpan={6} className="border px-4 py-3 text-center text-gray-500">
                                         Aucun couple trouvé
                                     </td>
                                 </tr>
@@ -271,42 +215,6 @@ const Couples = () => {
                     </table>
                 </div>
             </div>
-
-            {/* Status Modal */}
-            {statusModalOpen && selectedCouple && (
-                <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-                        <h3 className="text-xl font-bold mb-4">Modifier le statut</h3>
-                        <p className="mb-4">
-                            <span className="font-semibold">Couple:</span> {selectedCouple.nom_cavalier} {selectedCouple.prenom_cavalier}
-                        </p>
-                        <p className="mb-6">
-                            <span className="font-semibold">Statut actuel:</span> {selectedCouple.statut}
-                        </p>
-                        <div className="grid grid-cols-2 gap-3 mb-6">
-                            {statutOptions.map((option) => (
-                                <button
-                                    key={option.value}
-                                    className={`p-2 rounded-lg text-sm font-medium text-white`}
-                                    style={{ backgroundColor: option.color }}
-                                    onClick={() => updateCoupleStatut(selectedCouple.id, option.value)}
-                                    disabled={updatingId === selectedCouple.id}
-                                >
-                                    {option.label}
-                                </button>
-                            ))}
-                        </div>
-                        <div className="flex justify-end">
-                            <button
-                                className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
-                                onClick={closeStatusModal}
-                            >
-                                Annuler
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

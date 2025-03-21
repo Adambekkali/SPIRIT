@@ -100,7 +100,7 @@ const Epreuves = () => {
                                     <Td>{part.temps_total}</Td>
                                     <Td>{part.classement}</Td>
                                     <Td>
-                                        <StatusBadge status={part.couple.statut} />
+                                        <StatusBadge status={part.statut} /> {/* Use statut from Participer */}
                                     </Td>
                                     <Td>
                                         <button

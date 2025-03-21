@@ -71,6 +71,29 @@ export default function SelectCompetition() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // State for the new competition form
+  const [newCompetition, setNewCompetition] = useState({
+    numero: "",
+    intitule: "",
+    type: "",
+  });
+  const [formError, setFormError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const handleDeleteCompetition = async (competitionId: number) => {
+    try {
+        await fetch(`/api/competitions/${competitionId}`, { method: "DELETE" });
+        setCompetitions((prev) => prev.filter((comp) => comp.id !== competitionId));
+        setSelectedCompetition(null);
+    } catch (err) {
+        console.error("Erreur lors de la suppression de la compétition:", err);
+    } finally {
+        setConfirmDelete(false);
+    }
+  };
+
   // Charger les compétitions depuis l'API
   useEffect(() => {
     const loadCompetitions = async () => {
@@ -92,6 +115,38 @@ export default function SelectCompetition() {
   const handleSelectCompetition = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
     setSelectedCompetition(value ? Number(value) : null);
+  };
+
+  const handleCreateCompetition = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setFormError(null);
+
+    if (!newCompetition.numero || !newCompetition.intitule || !newCompetition.type) {
+      setFormError("Tous les champs sont obligatoires.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3000/api/competitions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newCompetition),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setFormError(errorData.error || "Erreur lors de la création de la compétition.");
+        return;
+      }
+
+      const createdCompetition = await response.json();
+      setCompetitions((prev) => [...prev, createdCompetition]);
+      setNewCompetition({ numero: "", intitule: "", type: "" });
+      setShowForm(false);
+    } catch (err) {
+      setFormError("Une erreur est survenue.");
+      console.error(err);
+    }
   };
 
   if (loading) {
@@ -144,6 +199,71 @@ export default function SelectCompetition() {
               ))}
             </tbody>
           </table>
+
+          {/* Bouton pour afficher le formulaire */}
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
+          >
+            {showForm ? "Annuler" : "Créer une nouvelle compétition"}
+          </button>
+
+          {/* Formulaire de création de compétition */}
+          {showForm && (
+            <div className="mt-4">
+              <form onSubmit={handleCreateCompetition} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Numéro</label>
+                  <input
+                    type="text"
+                    value={newCompetition.numero}
+                    onChange={(e) =>
+                      setNewCompetition({ ...newCompetition, numero: e.target.value })
+                    }
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Intitulé</label>
+                  <input
+                    type="text"
+                    value={newCompetition.intitule}
+                    onChange={(e) =>
+                      setNewCompetition({ ...newCompetition, intitule: e.target.value })
+                    }
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Type</label>
+                  <select
+                  value={newCompetition.type}
+                  onChange={(e) =>
+                    setNewCompetition({ ...newCompetition, type: e.target.value })
+                  }
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                  >
+                  <option value="">Sélectionnez un type</option>
+                  {competitions
+                    .map((comp) => comp.type)
+                    .filter((type, index, self) => self.indexOf(type) === index) // Remove duplicates
+                    .map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                    ))}
+                  </select>
+                </div>
+                {formError && <p className="text-red-500 text-sm">{formError}</p>}
+                <button
+                  type="submit"
+                  className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition"
+                >
+                  Créer
+                </button>
+              </form>
+            </div>
+          )}
         </div>
 
         {/* Détails de la compétition - Colonne de droite */}
@@ -186,6 +306,12 @@ export default function SelectCompetition() {
                         ) : null;
                       })()}
                     </div>
+                    <button
+                      onClick={() => setConfirmDelete(true)}
+                      className="mt-4 w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition"
+                    >
+                      Supprimer la compétition
+                    </button>
                   </>
                 )}
               </div>
@@ -197,6 +323,29 @@ export default function SelectCompetition() {
           )}
         </div>
       </div>
+      {/* Modal de confirmation de suppression */}
+      {confirmDelete && selectedCompetition && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                <h3 className="text-xl font-bold mb-4">Confirmer la suppression</h3>
+                <p className="mb-6">Êtes-vous sûr de vouloir supprimer cette compétition ?</p>
+                <div className="flex justify-end space-x-4">
+                    <button
+                        onClick={() => setConfirmDelete(false)}
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                    >
+                        Annuler
+                    </button>
+                    <button
+                        onClick={() => handleDeleteCompetition(selectedCompetition)}
+                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                    >
+                        Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+      )}
     </div>
   );
 }
