@@ -15,9 +15,10 @@ dist/
 # Environnement
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.production
+.env.test
+.env.*.local
+!.env.example
 .venv
 /venv
 
@@ -37,3 +38,7 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# test outputs
+test-outputs/
+res_test.txt
