@@ -1,38 +1,15 @@
 "use client";
 import React, { useEffect, useState } from "react";
 
+import { Competition, Epreuve } from "@/prisma/types";
+
 export default function Home() {
-  interface Competition {
-    id: number;
-    intitule: string;
-    type: string;
-    Competitions: { epreuve: Epreuve }[];
-  }
-
-  interface Epreuve {
-    id: number;
-    intitule: string;
-    statut: string;
-    competition: {
-      intitule: string;
-      type: string;
-    };
-    participations: { couple: Couple }[];
-  }
-
-  interface Couple {
-    id: number;
-    nom_cavalier: string;
-    prenom_cavalier: string;
-    nom_cheval: string;
-    ecurie: string;
-  }
-
   const [epreuves, setEpreuves] = useState<Epreuve[]>([]);
   const [filteredEpreuves, setFilteredEpreuves] = useState<Epreuve[]>([]);
   const [selectedEpreuve, setSelectedEpreuve] = useState<Epreuve | null>(null);
   const [competitions, setCompetitions] = useState<Competition[]>([]);
-  const [selectedCompetition, setSelectedCompetition] = useState<Competition | null>(null);
+  const [selectedCompetition, setSelectedCompetition] =
+    useState<Competition | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,7 +54,8 @@ export default function Home() {
     setFilteredEpreuves(filtered);
   }, [epreuves]);
 
-  if (loading) return <p className="text-center text-gray-500">Chargement...</p>;
+  if (loading)
+    return <p className="text-center text-gray-500">Chargement...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
@@ -98,7 +76,9 @@ export default function Home() {
               <li
                 key={competition.id}
                 className={`border-b pb-2 cursor-pointer hover:bg-gray-100 ${
-                  selectedCompetition?.id === competition.id ? "bg-gray-200" : ""
+                  selectedCompetition?.id === competition.id
+                    ? "bg-gray-200"
+                    : ""
                 }`}
                 onClick={() => setSelectedCompetition(competition)}
               >
@@ -123,7 +103,8 @@ export default function Home() {
                 filteredEpreuves
                   .filter(
                     (epreuve) =>
-                      epreuve.competition.intitule === selectedCompetition.intitule
+                      epreuve.competition?.intitule ===
+                      selectedCompetition.intitule
                   )
                   .map((epreuve) => (
                     <li
@@ -134,7 +115,8 @@ export default function Home() {
                       <strong>{epreuve.intitule}</strong>{" "}
                       <StatusBadge status={epreuve.statut} />
                       <p className="text-sm text-gray-600">
-                        Nombre de participations : {epreuve.participations.length}
+                        Nombre de participations :{" "}
+                        {epreuve.participations?.length || 0}
                       </p>
                     </li>
                   ))
@@ -148,26 +130,28 @@ export default function Home() {
           {selectedEpreuve && (
             <div className="bg-white shadow-md rounded-lg p-6 col-span-2">
               <h2 className="text-2xl font-semibold mb-4">
-                Participants de l'épreuve : {selectedEpreuve.intitule}
+                {`Participants de l'épreuve : ${selectedEpreuve.intitule}`}
               </h2>
               <p className="text-sm text-gray-600 mb-4">
-                Compétition : {selectedEpreuve.competition.intitule} (
-                {selectedEpreuve.competition.type})
+                Compétition : {selectedEpreuve.competition?.intitule} (
+                {selectedEpreuve.competition?.type})
               </p>
               <ul className="space-y-3">
-                {selectedEpreuve.participations.length > 0 ? (
-                  selectedEpreuve.participations.map((participation, index) => (
-                    <li key={index} className="border-b pb-2">
-                      <strong>
-                        {participation.couple.nom_cavalier}{" "}
-                        {participation.couple.prenom_cavalier}
-                      </strong>{" "}
-                      - {participation.couple.nom_cheval}
-                      <p className="text-sm text-gray-600">
-                        Écurie : {participation.couple.ecurie}
-                      </p>
-                    </li>
-                  ))
+                {(selectedEpreuve.participations?.length ?? 0) > 0 ? (
+                  selectedEpreuve.participations?.map(
+                    (participation, index) => (
+                      <li key={index} className="border-b pb-2">
+                        <strong>
+                          {participation.couple?.nom_cavalier}{" "}
+                          {participation.couple?.prenom_cavalier}
+                        </strong>{" "}
+                        - {participation.couple?.nom_cheval}
+                        <p className="text-sm text-gray-600">
+                          Écurie : {participation.couple?.ecurie}
+                        </p>
+                      </li>
+                    )
+                  )
                 ) : (
                   <li>Aucun participant pour cette épreuve</li>
                 )}
