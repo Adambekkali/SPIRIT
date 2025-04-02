@@ -315,7 +315,7 @@ class LoginTest(unittest.TestCase):
                 'logs': self.test_logs.copy(),
                 'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             }
-    
+
     def tearDown(self):
         """Nettoyage après chaque test"""
         self.log("\nFermeture du navigateur...")
@@ -324,36 +324,32 @@ class LoginTest(unittest.TestCase):
 
 def create_test_results_file():
     """Crée un fichier texte avec les résultats des tests, en remplaçant l'ancien"""
-    
-    # Créer le dossier tests s'il n'existe pas
-    if not os.path.exists('tests'):
-        os.makedirs('tests')
-    
+
     # Supprimer tous les anciens fichiers de résultats
-    for f in os.listdir('tests'):
-        if f.startswith('res_test'):
-            os.remove(os.path.join('tests', f))
-    
+    for f in os.listdir('test-outputs'):
+        if f.startswith('selenium_test'):
+            os.remove(os.path.join('test-outputs', f))
+
     # Nom du fichier fixe (sans horodatage)
-    filename = "tests/res_test.txt"
-    
+    filename = "test-outputs/selenium_test.txt"
+
     with open(filename, 'w', encoding='utf-8') as f:
         f.write("="*70 + "\n")
         f.write(f"RAPPORT DE TEST - {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
         f.write("="*70 + "\n\n")
-        
+
         # Résumé général
         successful_count = len(test_results['successful'])
         failed_count = len(test_results['failed'])
         total_count = successful_count + failed_count
         success_rate = (successful_count / total_count * 100) if total_count > 0 else 0
-        
+
         f.write(f"RÉSUMÉ GÉNÉRAL:\n")
         f.write(f"  Total des tests exécutés: {total_count}\n")
         f.write(f"  Tests réussis: {successful_count}\n")
         f.write(f"  Tests échoués: {failed_count}\n")
         f.write(f"  Taux de réussite: {success_rate:.1f}%\n\n")
-        
+
         # Liste des tests réussis
         f.write("TESTS RÉUSSIS:\n")
         if test_results['successful']:
@@ -362,7 +358,7 @@ def create_test_results_file():
         else:
             f.write("  Aucun test réussi\n")
         f.write("\n")
-        
+
         # Liste des tests échoués
         f.write("TESTS ÉCHOUÉS:\n")
         if test_results['failed']:
@@ -371,25 +367,24 @@ def create_test_results_file():
         else:
             f.write("  Aucun test échoué\n")
         f.write("\n")
-        
+
         # Détails de chaque test
         f.write("="*70 + "\n")
         f.write("DÉTAILS DES TESTS\n")
         f.write("="*70 + "\n\n")
-        
+
         for test_name, details in test_results['details'].items():
             f.write(f"TEST: {test_name}\n")
             f.write(f"  Statut: {'RÉUSSI' if details['status'] == 'success' else 'ÉCHOUÉ'}\n")
             f.write(f"  Horodatage: {details['timestamp']}\n")
             f.write(f"  Durée: {details['duration']}\n")
             f.write("  Logs:\n")
-            
+
             # Ajouter les logs avec indentation
             for log in details['logs']:
                 f.write(f"    {log}\n")
-            
+
             f.write("\n" + "-"*70 + "\n\n")
-    
     print(f"\nRapport de test créé: {filename}")
     return filename
 
@@ -428,14 +423,18 @@ if __name__ == "__main__":
     print("=== DÉBUT DES TESTS DE CONNEXION ===\n")
     
     # Supprimer les anciens fichiers de résultats avant de commencer les tests
-    if os.path.exists('tests'):
-        for f in os.listdir('tests'):
-            if f.startswith('res_test'):
+    if os.path.exists('test-outputs'):
+        print("Dossier test-outputs existe")
+        for f in os.listdir('test-outputs'):
+            if f.startswith('selenium_test'):
                 try:
-                    os.remove(os.path.join('tests', f))
+                    os.remove(os.path.join('test-outputs', f))
                     print(f"Ancien fichier supprimé: {f}")
                 except Exception as e:
                     print(f"Impossible de supprimer {f}: {e}")
+    else:
+        os.makedirs('test-outputs')
+        print("Dossier test-outputs créé")
     
     try:
         unittest.main(exit=False, verbosity=2)

@@ -13,7 +13,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Créer un dossier pour les résultats des tests
-RUN mkdir -p /app/tests/results
+RUN mkdir -p /app/test-outputs
 
 # Copier le script d'attente et le rendre exécutable
 COPY wait-for-it.sh /wait-for-it.sh
@@ -26,5 +26,9 @@ COPY . .
 COPY check-services.sh /check-services.sh
 RUN chmod +x /check-services.sh
 
-# Par défaut, exécuter le script qui vérifie tous les services avant de lancer les tests
-CMD ["sh", "check-services.sh"]
+# Créer et copier le nouveau script watch-tests.sh
+COPY watch-tests.sh /watch-tests.sh
+RUN chmod +x /watch-tests.sh
+
+# Utiliser le nouveau script qui garde le conteneur en vie
+CMD ["sh", "watch-tests.sh"]

@@ -43,6 +43,7 @@ services:
       dockerfile: dockerfile.test
     volumes:
       - ./front-back/tests:/app/tests
+      - ./front-back/tests/test-outputs:/app/test-outputs
     depends_on:
       selenium:
         condition: service_healthy
