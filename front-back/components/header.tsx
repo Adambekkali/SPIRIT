@@ -23,7 +23,7 @@ const Header = () => {
       : [];
 
   const juryLinks =
-    user?.type === "jury" ? [{ name: "Jury", href: "/SR" }] : [];
+    user?.type === "jury" ? [{ name: "Jury", href: "/jury" }] : [];
 
   // Tous les liens
   const allLinks = [...navLinks, ...adminLinks, ...juryLinks];
