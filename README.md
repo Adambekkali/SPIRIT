@@ -20,6 +20,8 @@ Front-end: Next
 
 ```bash
 # Démarrer l'environnement
+./dc du
+ou
 docker-compose up -d
 
 # Voir les logs
@@ -29,6 +31,8 @@ docker-compose logs -f
 docker-compose exec front-back npm install nom-du-package
 
 # Arrêter l'environnement
+./dc dd
+ou
 docker-compose down
 ```
 
@@ -36,12 +40,14 @@ docker-compose down
 
 ```bash
 # Démarrer les tests
+./dc tu
 docker-compose -f docker-compose.yml -f docker-compose.test.yml up -d
 
 # Voir les logs des tests
 docker-compose -f docker-compose.yml -f docker-compose.test.yml logs -f test-runner
 
 # Arrêter l'environnement de test
+./dc td
 docker-compose -f docker-compose.yml -f docker-compose.test.yml down
 ```
 
@@ -55,12 +61,14 @@ DB_PASSWORD=votre_password
 DB_NAME=votre_db
 
 # 2. Démarrer en production
+./dc pu
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 # Voir les logs de production
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml logs -f
 
 # Arrêter l'environnement de production
+./dc pd
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
 ```
 
