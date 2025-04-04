@@ -16,7 +16,7 @@ if ($Env -notin @("du", "tu", "pu", "dd", "td", "pd")) {
 
 $composeFiles = @{
     "du" = "docker-compose.yml up -d"
-    "tu" = "docker-compose.yml -f docker-compose.test.yml up -d --build --no-cache test-runner"
+    "tu" = "docker-compose.yml -f docker-compose.test.yml up -d --build"
     "pu" = "docker-compose.yml -f docker-compose.prod.yml up -d --build --no-cache"
     "dd" = "docker-compose.yml down"
     "td" = "docker-compose -f docker-compose.test.yml down -v"

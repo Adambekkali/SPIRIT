@@ -1,6 +1,6 @@
 'use client';
 
-import { StatutParticipation } from "@prisma/client";
+//import { StatutParticipation } from "@prisma/client";
 import React, { useState, useEffect } from "react";
 
 // Types
